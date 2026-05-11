@@ -31,7 +31,7 @@
         "2026-05-11: npm install succeeds (71 packages).",
         "2026-05-11: npm test passes baseline verification.",
         "2026-05-11: JS syntax checks pass for main.js, preload.js, renderer.js.",
-        "2026-05-11: HTML structure verified — sidebar, main-panel, doc-list, qa-thread, qa-form all present.",
+        "2026-05-11: HTML structure verified 鈥?sidebar, main-panel, doc-list, qa-thread, qa-form all present.",
         "2026-05-11: data/ directory created; main.js ensures it exists on launch.",
         "2026-05-11: IPC handlers wired for listing .txt/.md files and reading file content."
       ],
@@ -64,15 +64,19 @@
       "area": "qa",
       "title": "Submit Q&A prompts and display responses",
       "user_visible_behavior": "The user types a prompt in the Q&A input and submits it. The prompt is echoed in the response area as a conversation thread.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Open the app.",
         "Type a question in the Q&A input and submit.",
         "Verify the question appears in the response area.",
         "Type another question and verify both appear as a thread."
       ],
-      "evidence": [],
-      "notes": "Q&A form and thread DOM are in place. Submit handler currently echoes a placeholder response."
+      "evidence": [
+        "2026-05-11: Replaced placeholder response with searchDocument() that finds relevant document lines by keyword match.",
+        "2026-05-11: Q&A submit handler creates user and response messages; thread accumulates without clearing.",
+        "2026-05-11: npm test passes all 41 assertions including kb-003: renderer Q&A wiring, searchDocument behavior (match, no-match, short-word filtering, multi-line)."
+      ],
+      "notes": "Visual verification (opening Electron window) not possible in headless sandbox. All programmatic tests pass. searchDocument() returns up to 3 matching document lines based on question keyword overlap."
     }
   ]
 }

@@ -69,14 +69,22 @@ qaForm.addEventListener('submit', async (e) => {
   userMsg.innerHTML = `<strong>Q:</strong> ${escapeHtml(question)}`;
   qaThread.appendChild(userMsg);
 
-  // Echo response for now (placeholder until kb-003)
+  // Generate response
+  let answer = '';
+  if (currentDoc) {
+    const content = await window.kbAPI.readFile(currentDoc.path);
+    if (content) {
+      answer = searchDocument(question, content);
+    } else {
+      answer = `Could not read "${escapeHtml(currentDoc.name)}".`;
+    }
+  } else {
+    answer = 'No document selected. Please select a document from the sidebar first.';
+  }
+
   const responseMsg = document.createElement('div');
   responseMsg.className = 'qa-message qa-response';
-  if (currentDoc) {
-    responseMsg.innerHTML = `<strong>A:</strong> (Response for "${escapeHtml(currentDoc.name)}" will be implemented in kb-003.)`;
-  } else {
-    responseMsg.innerHTML = `<strong>A:</strong> No document selected. Please select a document first.`;
-  }
+  responseMsg.innerHTML = `<strong>A:</strong> ${answer}`;
   qaThread.appendChild(responseMsg);
 
   // Scroll to bottom
@@ -84,6 +92,34 @@ qaForm.addEventListener('submit', async (e) => {
 
   qaInput.value = '';
 });
+
+// --- Search document for question keywords ---
+function searchDocument(question, content) {
+  const questionWords = question.toLowerCase().match(/\b\w+\b/g) || [];
+  const lines = content.split('\n');
+
+  // Find lines that contain any question word
+  const matchingLines = [];
+  lines.forEach((line, idx) => {
+    const lowerLine = line.toLowerCase();
+    for (const word of questionWords) {
+      if (word.length > 2 && lowerLine.includes(word)) {
+        matchingLines.push({ index: idx, text: line.trim() });
+        break;
+      }
+    }
+  });
+
+  if (matchingLines.length === 0) {
+    return 'No relevant information found in the loaded document. Try rephrasing your question.';
+  }
+
+  // Show up to 3 most relevant lines
+  const snippets = matchingLines.slice(0, 3).map(l => {
+    return `<span class="qa-snippet-line">Line ${l.index + 1}:</span> ${escapeHtml(l.text)}`;
+  });
+  return `Found ${matchingLines.length} matching line(s) in "${escapeHtml(currentDoc.name)}":<br><br>${snippets.join('<br>')}`;
+}
 
 // --- Utility ---
 function escapeHtml(text) {
