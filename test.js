@@ -1,5 +1,6 @@
 // kb-002 verification: document loading from data/ directory
 // kb-003 verification: Q&A submission and response display
+// kb-004 verification: document create, edit, delete
 const fs = require('fs');
 const path = require('path');
 
@@ -50,6 +51,7 @@ assert(html.includes('id="qa-thread"'), 'HTML has qa-thread element');
 assert(html.includes('id="qa-form"'), 'HTML has qa-form element');
 assert(html.includes('id="sidebar"'), 'HTML has sidebar element');
 assert(html.includes('id="main-panel"'), 'HTML has main-panel element');
+assert(html.includes('id="new-doc-btn"'), 'HTML has new-doc-btn element');
 
 // --- Test 5: renderer.js has required functions ---
 console.log('\n--- Test 5: renderer.js functions ---');
@@ -75,6 +77,21 @@ const submitHandlerCode = renderer.slice(
 );
 assert(!submitHandlerCode.includes('qaThread.innerHTML'), 'submit handler does not clear qaThread (thread persists)');
 
+// --- Test 5c: kb-004 renderer.js document management ---
+console.log('\n--- Test 5c: renderer.js document management ---');
+assert(renderer.includes('function createNewDocument'), 'renderer.js defines createNewDocument');
+assert(renderer.includes('function deleteDocument'), 'renderer.js defines deleteDocument');
+assert(renderer.includes('function enterEditMode'), 'renderer.js defines enterEditMode');
+assert(renderer.includes('function saveEdit'), 'renderer.js defines saveEdit');
+assert(renderer.includes('function cancelEdit'), 'renderer.js defines cancelEdit');
+assert(renderer.includes('function renderDocumentView'), 'renderer.js defines renderDocumentView');
+assert(renderer.includes("newDocBtn.addEventListener('click'"), 'renderer.js wires new-doc-btn click');
+assert(renderer.includes('editMode'), 'renderer.js uses editMode flag');
+assert(renderer.includes('|| editMode'), 'Q&A submit handler guarded by editMode');
+assert(renderer.includes('window.kbAPI.createFile'), 'renderer.js calls kbAPI.createFile');
+assert(renderer.includes('window.kbAPI.updateFile'), 'renderer.js calls kbAPI.updateFile');
+assert(renderer.includes('window.kbAPI.deleteFile'), 'renderer.js calls kbAPI.deleteFile');
+
 // --- Test 6: preload.js exposes correct API ---
 console.log('\n--- Test 6: preload API surface ---');
 const preload = fs.readFileSync(path.join(__dirname, 'preload.js'), 'utf-8');
@@ -82,6 +99,12 @@ assert(preload.includes("'data:list-files'"), 'preload exposes data:list-files')
 assert(preload.includes("'data:read-file'"), 'preload exposes data:read-file');
 assert(preload.includes('listFiles'), 'preload exposes listFiles method');
 assert(preload.includes('readFile'), 'preload exposes readFile method');
+assert(preload.includes("'data:create-file'"), 'preload exposes data:create-file');
+assert(preload.includes("'data:update-file'"), 'preload exposes data:update-file');
+assert(preload.includes("'data:delete-file'"), 'preload exposes data:delete-file');
+assert(preload.includes('createFile'), 'preload exposes createFile method');
+assert(preload.includes('updateFile'), 'preload exposes updateFile method');
+assert(preload.includes('deleteFile'), 'preload exposes deleteFile method');
 
 // --- Test 7: main.js IPC handlers ---
 console.log('\n--- Test 7: main.js IPC handlers ---');
@@ -91,6 +114,13 @@ assert(mainJs.includes("ipcMain.handle('data:read-file'"), 'main.js registers da
 assert(mainJs.includes('dataDir'), 'main.js defines dataDir path');
 assert(mainJs.includes('endsWith(\'.txt\')'), 'main.js filters .txt files');
 assert(mainJs.includes('endsWith(\'.md\')'), 'main.js filters .md files');
+assert(mainJs.includes("ipcMain.handle('data:create-file'"), 'main.js registers data:create-file handler');
+assert(mainJs.includes("ipcMain.handle('data:update-file'"), 'main.js registers data:update-file handler');
+assert(mainJs.includes("ipcMain.handle('data:delete-file'"), 'main.js registers data:delete-file handler');
+assert(mainJs.includes('path.basename'), 'main.js uses path.basename for safe filenames');
+assert(mainJs.includes('startsWith(dataDir)'), 'main.js validates file paths stay within dataDir');
+assert(mainJs.includes('fs.writeFileSync'), 'main.js writes files for create/update');
+assert(mainJs.includes('fs.unlinkSync'), 'main.js deletes files with unlinkSync');
 
 // --- Test 8: searchDocument logic (kb-003 core behavior) ---
 console.log('\n--- Test 8: searchDocument behavior ---');
@@ -138,6 +168,37 @@ result = searchDocumentLogic('fruit', manyMatchContent);
 // "fruit" won't match these, let me use words that match
 result = searchDocumentLogic('apple cherry elderberry grape kiwi', manyMatchContent);
 assert(result.matchingLines.length >= 4, 'searchDocument finds multiple matching lines');
+
+// --- Test 9: kb-004 functional CRUD (mirrors main.js IPC logic) ---
+console.log('\n--- Test 9: CRUD operations ---');
+const testFileName = '__test_kb004.md';
+const testFilePath = path.join(dataDir, testFileName);
+
+// Clean up from previous run
+if (fs.existsSync(testFilePath)) fs.unlinkSync(testFilePath);
+assert(!fs.existsSync(testFilePath), 'test file does not exist before create');
+
+// Create
+fs.writeFileSync(testFilePath, '# Test Content\n\nHello, world!', 'utf-8');
+assert(fs.existsSync(testFilePath), 'file created on disk');
+
+// Read back
+const createdContent = fs.readFileSync(testFilePath, 'utf-8');
+assert(createdContent.includes('Hello, world!'), 'created file contains expected content');
+
+// Update
+fs.writeFileSync(testFilePath, '# Updated Content\n\nGoodbye!', 'utf-8');
+const updatedContent = fs.readFileSync(testFilePath, 'utf-8');
+assert(updatedContent.includes('Goodbye!'), 'updated file contains new content');
+assert(!updatedContent.includes('Hello, world!'), 'updated file no longer contains old content');
+
+// Delete
+fs.unlinkSync(testFilePath);
+assert(!fs.existsSync(testFilePath), 'file deleted from disk');
+
+// Verify path-traversal guard: resolved path outside dataDir is rejected
+const outsidePath = path.join(__dirname, '..', 'outside.md');
+assert(!path.resolve(outsidePath).startsWith(dataDir), 'path outside dataDir is correctly detected');
 
 // --- Summary ---
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===`);

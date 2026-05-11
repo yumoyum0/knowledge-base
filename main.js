@@ -53,6 +53,58 @@ ipcMain.handle('data:get-path', async () => {
   return dataDir;
 });
 
+// IPC: create a new file
+ipcMain.handle('data:create-file', async (_event, name, content) => {
+  try {
+    const safeName = path.basename(name); // prevent path traversal
+    if (!safeName || (!safeName.endsWith('.txt') && !safeName.endsWith('.md'))) {
+      return { error: 'Filename must end with .txt or .md' };
+    }
+    const filePath = path.join(dataDir, safeName);
+    if (fs.existsSync(filePath)) {
+      return { error: 'File already exists' };
+    }
+    fs.writeFileSync(filePath, content || '', 'utf-8');
+    return { name: safeName, path: filePath };
+  } catch (err) {
+    return { error: err.message };
+  }
+});
+
+// IPC: update a file's content
+ipcMain.handle('data:update-file', async (_event, filePath, content) => {
+  try {
+    const resolved = path.resolve(filePath);
+    if (!resolved.startsWith(dataDir)) {
+      return { error: 'Access denied' };
+    }
+    if (!fs.existsSync(resolved)) {
+      return { error: 'File not found' };
+    }
+    fs.writeFileSync(resolved, content, 'utf-8');
+    return { success: true };
+  } catch (err) {
+    return { error: err.message };
+  }
+});
+
+// IPC: delete a file
+ipcMain.handle('data:delete-file', async (_event, filePath) => {
+  try {
+    const resolved = path.resolve(filePath);
+    if (!resolved.startsWith(dataDir)) {
+      return { error: 'Access denied' };
+    }
+    if (!fs.existsSync(resolved)) {
+      return { error: 'File not found' };
+    }
+    fs.unlinkSync(resolved);
+    return { success: true };
+  } catch (err) {
+    return { error: err.message };
+  }
+});
+
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {

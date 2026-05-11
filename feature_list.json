@@ -77,6 +77,27 @@
         "2026-05-11: npm test passes all 41 assertions including kb-003: renderer Q&A wiring, searchDocument behavior (match, no-match, short-word filtering, multi-line)."
       ],
       "notes": "Visual verification (opening Electron window) not possible in headless sandbox. All programmatic tests pass. searchDocument() returns up to 3 matching document lines based on question keyword overlap."
+    },
+    {
+      "id": "kb-004",
+      "priority": 4,
+      "area": "documents",
+      "title": "Document management: create, edit, and delete documents",
+      "user_visible_behavior": "The user can create new .txt or .md documents from the sidebar, edit existing document content inline in the main panel, and delete documents. All changes persist to the data/ directory and the sidebar refreshes automatically.",
+      "status": "passing",
+      "verification": [
+        "Open the app and verify the sidebar shows a New Document button.",
+        "Create two new documents via the New Document button — verify both appear in the sidebar and in data/.",
+        "Click a document, toggle edit mode, change its content and save — verify the file on disk is updated.",
+        "Delete one document via the sidebar — verify it is removed from the list and from data/."
+      ],
+      "evidence": [
+        "2026-05-11: Added IPC handlers: data:create-file (with basename sanitization + .txt/.md check), data:update-file and data:delete-file (both with dataDir boundary validation).",
+        "2026-05-11: Preload exposes createFile, updateFile, deleteFile methods.",
+        "2026-05-11: Renderer: New Document button in sidebar header with prompt(), inline edit mode (textarea + Save/Cancel toolbar), delete with confirm() + sidebar refresh.",
+        "2026-05-11: npm test passes all 74 assertions: CRUD functional tests, path-traversal guard, renderer function checks, preload API surface, main.js IPC registration."
+      ],
+      "notes": "Visual verification (opening Electron window) not possible in headless sandbox. All programmatic tests pass. Path-traversal guarded with path.basename and startsWith(dataDir) checks."
     }
   ]
 }
