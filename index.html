@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <title>Knowledge Base</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar: Document List -->
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <h2>Documents</h2>
+      </div>
+      <ul id="doc-list" class="doc-list">
+        <li class="doc-list-empty">No documents found.</li>
+      </ul>
+      <div class="sidebar-footer">
+        <small id="data-path"></small>
+      </div>
+    </aside>
+
+    <!-- Main: Q&A Panel -->
+    <main id="main-panel">
+      <div class="qa-header">
+        <h1>Q&amp;A</h1>
+      </div>
+      <div id="qa-thread" class="qa-thread">
+        <div class="qa-placeholder">
+          <p>Select a document from the sidebar, then ask a question about it.</p>
+        </div>
+      </div>
+      <div class="qa-input-area">
+        <form id="qa-form">
+          <input type="text" id="qa-input" placeholder="Ask a question..." autocomplete="off">
+          <button type="submit" id="qa-submit">Send</button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

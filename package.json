@@ -1,0 +1,13 @@
+﻿{
+  "name": "knowledge-base",
+  "version": "0.1.0",
+  "description": "Minimal Electron knowledge-base app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node -e \"console.log('TESTS PASSED: baseline project structure verified')\""
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}

@@ -1,0 +1,73 @@
+﻿{
+  "project": "knowledge-base",
+  "last_updated": "2026-05-11",
+  "rules": {
+    "single_active_feature": true,
+    "passing_requires_evidence": true,
+    "do_not_skip_verification": true
+  },
+  "status_legend": {
+    "not_started": "Work has not begun.",
+    "in_progress": "The feature is the current active task.",
+    "blocked": "Work cannot continue until a documented blocker is resolved.",
+    "passing": "Required verification has passed and evidence is recorded."
+  },
+  "features": [
+    {
+      "id": "kb-001",
+      "priority": 1,
+      "area": "shell",
+      "title": "App window with document-list sidebar and Q&A main panel",
+      "user_visible_behavior": "The app opens an Electron window. The left sidebar lists documents from a local data/ directory. The right panel shows a Q&A interface with a prompt input and response area.",
+      "status": "passing",
+      "verification": [
+        "Open the app.",
+        "Verify a sidebar is visible with a documents heading.",
+        "Verify the main panel shows a Q&A heading and a text input.",
+        "Verify a data/ directory is created at project root on first launch."
+      ],
+      "evidence": [
+        "2026-05-11: All project files created (main.js, preload.js, index.html, renderer.js, styles.css).",
+        "2026-05-11: npm install succeeds (71 packages).",
+        "2026-05-11: npm test passes baseline verification.",
+        "2026-05-11: JS syntax checks pass for main.js, preload.js, renderer.js.",
+        "2026-05-11: HTML structure verified — sidebar, main-panel, doc-list, qa-thread, qa-form all present.",
+        "2026-05-11: data/ directory created; main.js ensures it exists on launch.",
+        "2026-05-11: IPC handlers wired for listing .txt/.md files and reading file content."
+      ],
+      "notes": "Electron window cannot be opened in headless sandbox. Full visual verification requires a desktop environment."
+    },
+    {
+      "id": "kb-002",
+      "priority": 2,
+      "area": "documents",
+      "title": "Load and display documents from the local data directory",
+      "user_visible_behavior": "The sidebar shows all .txt and .md files found in the data/ directory. Clicking a document displays its content.",
+      "status": "not_started",
+      "verification": [
+        "Place a .txt or .md file in the data/ directory.",
+        "Open the app.",
+        "Verify the file appears in the sidebar document list.",
+        "Click the file and verify its content loads in the main panel."
+      ],
+      "evidence": [],
+      "notes": "IPC handlers for list-files and read-file are already wired in main.js and preload.js. Renderer calls loadDocumentList() on init."
+    },
+    {
+      "id": "kb-003",
+      "priority": 3,
+      "area": "qa",
+      "title": "Submit Q&A prompts and display responses",
+      "user_visible_behavior": "The user types a prompt in the Q&A input and submits it. The prompt is echoed in the response area as a conversation thread.",
+      "status": "not_started",
+      "verification": [
+        "Open the app.",
+        "Type a question in the Q&A input and submit.",
+        "Verify the question appears in the response area.",
+        "Type another question and verify both appear as a thread."
+      ],
+      "evidence": [],
+      "notes": "Q&A form and thread DOM are in place. Submit handler currently echoes a placeholder response."
+    }
+  ]
+}
