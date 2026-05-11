@@ -85,7 +85,12 @@ assert(renderer.includes('function enterEditMode'), 'renderer.js defines enterEd
 assert(renderer.includes('function saveEdit'), 'renderer.js defines saveEdit');
 assert(renderer.includes('function cancelEdit'), 'renderer.js defines cancelEdit');
 assert(renderer.includes('function renderDocumentView'), 'renderer.js defines renderDocumentView');
-assert(renderer.includes("newDocBtn.addEventListener('click'"), 'renderer.js wires new-doc-btn click');
+assert(renderer.includes("newDocBtn.addEventListener('click'"), 'renderer.js wires new-doc-btn click inside init()');
+// Verify newDocBtn listener is inside init(), not at top level (robust DOM timing)
+const initFnStart = renderer.indexOf('async function init()');
+const initFnEnd = renderer.indexOf('\n}\n\ninit();', initFnStart);
+const initFnBody = renderer.slice(initFnStart, initFnEnd > 0 ? initFnEnd : renderer.length);
+assert(initFnBody.includes("newDocBtn.addEventListener('click'"), 'newDocBtn listener is inside init() function body');
 assert(renderer.includes('editMode'), 'renderer.js uses editMode flag');
 assert(renderer.includes('|| editMode'), 'Q&A submit handler guarded by editMode');
 assert(renderer.includes('window.kbAPI.createFile'), 'renderer.js calls kbAPI.createFile');

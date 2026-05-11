@@ -173,9 +173,6 @@ async function deleteDocument(file) {
   await loadDocumentList();
 }
 
-// --- New Document button handler ---
-newDocBtn.addEventListener('click', createNewDocument);
-
 // --- Handle Q&A submission ---
 qaForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -256,6 +253,11 @@ async function init() {
   const dataPath = await window.kbAPI.getDataPath();
   dataPathEl.textContent = `Data: ${dataPath}`;
   await loadDocumentList();
+
+  // Wire the New Document button (inside init for guaranteed DOM readiness)
+  if (newDocBtn) {
+    newDocBtn.addEventListener('click', createNewDocument);
+  }
 }
 
 init();

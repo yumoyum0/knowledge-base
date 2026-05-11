@@ -24,9 +24,11 @@
 - Conversation thread accumulates multiple Q&A pairs without clearing on submit.
 - Document CRUD: New Document button (+ New) in sidebar header; inline edit mode with textarea + Save/Cancel; delete with confirmation. All changes persist to data/ directory.
 - Path-traversal protection: create uses `path.basename`, update/delete validate paths stay within `dataDir`.
+- `quality-document.md`: populated with grades for Document Management (B), Q&A Flow (B), Main Process (B), Preload (B), Renderer (B).
+- Fixed newDocBtn event listener: moved from top-level into `init()` to eliminate DOM-readiness timing risk.
 
 ### Known Limitations
 - Electron cannot be launched in this headless sandbox environment. Visual verification requires a desktop.
 
 ### Next Step
-All features (kb-001 through kb-004) are passing. Consider adding new features to `feature_list.json`.
+All features (kb-001 through kb-004) are passing. `quality-document.md` is populated. Consider adding new features to `feature_list.json`.
