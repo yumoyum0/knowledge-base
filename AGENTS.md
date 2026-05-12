@@ -37,14 +37,12 @@ Both scripts run `npm install`, `npm test`, and `npm run lint`. They also set up
 ```
 main.js  ←→  preload.js  ←→  renderer.js
 (ipcMain)     (contextBridge)   (kbAPI.*)
-
-main.js owns the filesystem. renderer.js owns the DOM.
-preload.js is a narrow, auditable bridge between them.
 ```
 
 - **contextIsolation: true** — renderer cannot access Node.js directly
 - **nodeIntegration: false** — no `require()` in the browser context
 - All data flows through named IPC channels (`data:list-files`, `data:read-file`, etc.)
+- Full IPC contract documented in main.js and preload.js header comments
 
 ## Startup Workflow
 
@@ -59,8 +57,8 @@ Before writing code:
 5. Run `./init.sh` or `./init.ps1`.
 6. Confirm baseline verification passes before starting new work.
 
-If baseline verification is already failing, fix that first. Do not stack new
-feature work on top of a broken starting state.
+If baseline verification is already failing, fix that first. See
+[docs/recovery.md](docs/recovery.md).
 
 ### Git Note
 
@@ -87,44 +85,16 @@ Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 - New filenames must go through `path.basename()` before touching disk.
 - Keep the preload API surface minimal — add new IPC channels only when necessary.
 
-## Working Rules
+## Topic Docs
 
-- Work on one feature at a time.
-- Do not mark a feature complete just because code was added.
-- Keep changes within the selected feature scope unless a blocker forces a
-  narrow supporting fix.
-- Do not silently change verification rules during implementation.
-- Prefer durable repo artifacts over chat summaries.
+Read when writing code or committing:
+- [Working Conventions](docs/working-conventions.md) — working rules + commit conventions
 
-## Commit Conventions
+Read when something breaks:
+- [Recovery Procedures](docs/recovery.md) — baseline repair, stale artifacts, dependency reset
 
-```
-kb-XXX: short description — status
-```
-
-Examples:
-- `kb-004: document management — create, edit, delete with path safety — passing`
-- `harness: add ESLint; fix lint issues in main.js — feedback 3->4`
-
-## Session Lifecycle
-
-- **Before closing a session**: Follow the checklist in [docs/session-checklist.md](docs/session-checklist.md).
-  Covers required artifacts, definition of done, end-of-session steps, and pre-commit verification.
-
-## Recovery
-
-If baseline verification fails when you first run init:
-
-1. Check what changed: `git status`
-2. Revert unintended changes: `git checkout -- .`
-3. Re-run init: `./init.sh` or `./init.ps1`
-
-If tests fail after your own changes:
-- Check for stale test artifacts: `rm data/__test_kb004.md` (test.js Test 9 leaves this if it crashed)
-- Re-run: `npm test`
-
-If dependencies are corrupted:
-- Delete and reinstall: `rm -rf node_modules && npm install`
+Read when closing a session:
+- [Session Checklist](docs/session-checklist.md) — required artifacts, definition of done, end-of-session steps
 
 ## Troubleshooting
 
@@ -138,11 +108,8 @@ If dependencies are corrupted:
 ## Further Reading
 
 Read when orienting or investigating:
-- [Harness Engineering](data/Harness%20Engineering.md) — the five-subsystem harness model this repo follows
+- [Harness Engineering](data/Harness%20Engineering.md) — the five-subsystem harness model
 - [Five-Tuple Audit](exercises/five-tuple%20harness%20audit.md) — completed harness audit with scores
 
-Read when adding tests or diagnosing failures:
-- [Session Checklist](docs/session-checklist.md) — required artifacts, definition of done, end-of-session steps
-
-Read when starting a new session:
-- [quality-document.md](quality-document.md) — quality grades per domain and architectural layer
+Read when planning work:
+- [quality-document.md](quality-document.md) — quality grades per domain and layer

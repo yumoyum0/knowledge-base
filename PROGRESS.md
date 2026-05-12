@@ -10,6 +10,9 @@
 - Renamed claude-progress.md to PROGRESS.md.
 
 ### Actions Taken
+- **Progressive disclosure refactor**: AGENTS.md reduced from ~120 to 84 lines. Created 3 topic docs: working-conventions.md, recovery.md, session-checklist.md. SNR improved for all 5 task types (+7 to +16 points).
+- **SNR audit**: Scored 16 entries against 5 task types. Extracted low-SNR entries to topic docs.
+
 - **SNR audit**: Scored 16 instruction entries against 5 task types. Lowest SNR: Handoff (38%), Verification (44%). Extracted End of Session + Definition of Done + Required Artifacts to docs/session-checklist.md. Added applicability conditions to Further Reading links. AGENTS.md condensed from ~120 to 107 lines.
 - **ACID assessment**: Scored all four dimensions: Atomicity B->B+, Consistency A, Isolation B, Durability A. Added Recovery section to AGENTS.md.
 
@@ -70,6 +73,7 @@ All subsystems at 3/5 or above. All features passing. Consider new features (doc
 
 ### Next Step
 All features passing. Consider adding new features to feature_list.json.
+
 
 
 
