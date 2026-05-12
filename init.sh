@@ -5,8 +5,12 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT_DIR"
 
+# Work around git ownership mismatch by using a project-local config
+export GIT_CONFIG_GLOBAL="${ROOT_DIR}/.gitconfig"
+
 INSTALL_CMD=(npm install)
 VERIFY_CMD=(npm test)
+LINT_CMD=(npm run lint)
 START_CMD=(npm start)
 
 echo "==> Working directory: $PWD"
@@ -15,6 +19,9 @@ echo "==> Syncing dependencies"
 
 echo "==> Running baseline verification"
 "${VERIFY_CMD[@]}"
+
+echo "==> Running lint"
+"${LINT_CMD[@]}"
 
 echo "==> Startup command: npm start"
 

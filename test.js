@@ -1,4 +1,4 @@
-// kb-002 verification: document loading from data/ directory
+﻿// kb-002 verification: document loading from data/ directory
 // kb-003 verification: Q&A submission and response display
 // kb-004 verification: document create, edit, delete
 const fs = require('fs');
@@ -160,7 +160,7 @@ assert(result.matchingLines.length > 0, 'searchDocument finds lines with "sideba
 result = searchDocumentLogic('xyzzy nothing', sampleContent);
 assert(result.matchingLines.length === 0, 'searchDocument returns empty for no matches');
 
-// Short words (≤2 chars) are ignored
+// Short words (鈮? chars) are ignored
 result = searchDocumentLogic('is a to', sampleContent);
 // Short words are extracted but produce no matches (filtered at line-matching stage)
 const shortWords = result.questionWords.filter(w => w.length <= 2);
@@ -169,7 +169,7 @@ assert(result.matchingLines.length === 0, 'short words produce no matches');
 
 // searchDocument truncates to 3 snippets
 const manyMatchContent = 'apple banana\ncherry date\nelderberry fig\ngrape honeydew\nkiwi lemon';
-result = searchDocumentLogic('fruit', manyMatchContent);
+// 'fruit' won't match these; test with words that do instead
 // "fruit" won't match these, let me use words that match
 result = searchDocumentLogic('apple cherry elderberry grape kiwi', manyMatchContent);
 assert(result.matchingLines.length >= 4, 'searchDocument finds multiple matching lines');

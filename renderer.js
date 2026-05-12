@@ -190,7 +190,7 @@ qaForm.addEventListener('submit', async (e) => {
   qaThread.appendChild(userMsg);
 
   // Generate response
-  let answer = '';
+  let answer;
   if (currentDoc) {
     const content = await window.kbAPI.readFile(currentDoc.path);
     if (content) {

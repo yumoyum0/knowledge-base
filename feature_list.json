@@ -1,6 +1,6 @@
-{
+﻿{
   "project": "knowledge-base",
-  "last_updated": "2026-05-11",
+  "last_updated": "2026-05-12",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -31,7 +31,7 @@
         "2026-05-11: npm install succeeds (71 packages).",
         "2026-05-11: npm test passes baseline verification.",
         "2026-05-11: JS syntax checks pass for main.js, preload.js, renderer.js.",
-        "2026-05-11: HTML structure verified 閳?sidebar, main-panel, doc-list, qa-thread, qa-form all present.",
+        "2026-05-11: HTML structure verified -- sidebar, main-panel, doc-list, qa-thread, qa-form all present.",
         "2026-05-11: data/ directory created; main.js ensures it exists on launch.",
         "2026-05-11: IPC handlers wired for listing .txt/.md files and reading file content."
       ],
@@ -87,9 +87,9 @@
       "status": "passing",
       "verification": [
         "Open the app and verify the sidebar shows a New Document button.",
-        "Create two new documents via the New Document button 鈥?verify both appear in the sidebar and in data/.",
-        "Click a document, toggle edit mode, change its content and save 鈥?verify the file on disk is updated.",
-        "Delete one document via the sidebar 鈥?verify it is removed from the list and from data/."
+        "Create two new documents via the New Document button -- verify both appear in the sidebar and in data/.",
+        "Click a document, toggle edit mode, change its content and save -- verify the file on disk is updated.",
+        "Delete one document via the sidebar -- verify it is removed from the list and from data/."
       ],
       "evidence": [
         "2026-05-11: Added IPC handlers: data:create-file (with basename sanitization + .txt/.md check), data:update-file and data:delete-file (both with dataDir boundary validation).",

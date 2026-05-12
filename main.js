@@ -34,7 +34,7 @@ ipcMain.handle('data:list-files', async () => {
     return entries
       .filter(e => e.isFile() && (e.name.endsWith('.txt') || e.name.endsWith('.md')))
       .map(e => ({ name: e.name, path: path.join(dataDir, e.name) }));
-  } catch (err) {
+  } catch {
     return [];
   }
 });
@@ -43,7 +43,7 @@ ipcMain.handle('data:list-files', async () => {
 ipcMain.handle('data:read-file', async (_event, filePath) => {
   try {
     return fs.readFileSync(filePath, 'utf-8');
-  } catch (err) {
+  } catch {
     return null;
   }
 });
@@ -66,8 +66,8 @@ ipcMain.handle('data:create-file', async (_event, name, content) => {
     }
     fs.writeFileSync(filePath, content || '', 'utf-8');
     return { name: safeName, path: filePath };
-  } catch (err) {
-    return { error: err.message };
+  } catch (_err) {
+    return { error: _err.message };
   }
 });
 
@@ -83,8 +83,8 @@ ipcMain.handle('data:update-file', async (_event, filePath, content) => {
     }
     fs.writeFileSync(resolved, content, 'utf-8');
     return { success: true };
-  } catch (err) {
-    return { error: err.message };
+  } catch (_err) {
+    return { error: _err.message };
   }
 });
 
@@ -100,8 +100,8 @@ ipcMain.handle('data:delete-file', async (_event, filePath) => {
     }
     fs.unlinkSync(resolved);
     return { success: true };
-  } catch (err) {
-    return { error: err.message };
+  } catch (_err) {
+    return { error: _err.message };
   }
 });
 

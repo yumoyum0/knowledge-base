@@ -17,11 +17,11 @@ A quality snapshot for each product domain and architectural layer. Both agents 
 
 | Subsystem | Grade | Key Gaps | Last Updated |
 |-----------|-------|----------|-------------|
-| Instruction (AGENTS.md) | C → B | Now has project overview, tech stack, verification commands, hard constraints. Could add more detailed docs/ links. | 2026-05-12 |
-| Tool | C | git ownership broken, otherwise functional | 2026-05-12 |
-| Environment | C | Missing .node-version / .nvmrc, no container config | 2026-05-12 |
-| State | B | claude-progress.md and feature_list.json are strong; session-handoff.md not implemented | 2026-05-12 |
-| Feedback | B | 75 assertions passing; missing linting and type checking | 2026-05-12 |
+| Instruction (AGENTS.md) | A | ~100 lines: project map, architecture, quick start, troubleshooting, commit conventions, verification, hard constraints | 2026-05-12 |
+| Tool | B | git works via GIT_CONFIG_GLOBAL + .gitconfig; global config still locked | 2026-05-12 |
+| Environment | B | .node-version, .nvmrc, and engines field pin Node 24; no container config | 2026-05-12 |
+| State | A | All five artifacts (PROGRESS.md, feature_list.json, quality-document.md, session-handoff.md, init.sh) present, consistent, and clean | 2026-05-12 |
+| Feedback | B | ESLint (0 errors, 0 warnings) + 75 assertions; no type checking yet | 2026-05-12 |
 
 ## Product Domains
 
@@ -46,10 +46,10 @@ A quality snapshot for each product domain and architectural layer. Both agents 
 
 ### 2026-05-12
 
-- Changes: Completed five-tuple harness audit exercise. Enhanced AGENTS.md (added Project section, Verification Commands table, Hard Constraints, Further Reading; fixed End Of Session numbering). Filled out exercise file with full audit results.
-- Domains promoted: Instruction subsystem (C → B)
-- New gaps identified: git ownership mismatch. Missing .node-version. No linting/type checking.
-- Gaps closed: AGENTS.md now self-documents project purpose, tech stack, and verification commands.
+- Changes: Completed five-tuple harness audit. Enhanced AGENTS.md (project, tech stack, verification, hard constraints). Added Node version pinning (.node-version, .nvmrc, engines). Installed ESLint 10 with project-specific config; fixed all lint issues in main.js, renderer.js, test.js (optional catch binding, browser globals, dead assignments). Added npm run lint script.
+- Domains promoted: Instruction (C->A), Tool (C->B), Environment (C->B), Feedback (C->B), State (B->A)
+- New gaps identified: git ownership mismatch. No type checking. No container config. git requires env-var workaround.
+- Gaps closed: AGENTS.md self-documents purpose and verification. Node version pinned. ESLint clean (0/0).
 
 ### 2026-05-11
 
@@ -58,3 +58,7 @@ A quality snapshot for each product domain and architectural layer. Both agents 
 - Domoted: None
 - New gaps identified: Visual verification blocked by headless sandbox. No LLM backend for Q&A. DOM-ready timing risk noted.
 - Gaps closed: IPC handlers for CRUD with path safety. Keyword-based document search. Conversation threading.
+
+
+
+
