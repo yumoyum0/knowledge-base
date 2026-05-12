@@ -52,8 +52,8 @@ Before writing code:
 
 1. Confirm the working directory with `pwd`.
 2. Read `PROGRESS.md` for the latest verified state and next step.
-3. Read `feature_list.json` and choose the highest-priority unfinished feature.\
-   If all features are passing, consult `quality-document.md` for unimplemented\
+3. Read `feature_list.json` and choose the highest-priority unfinished feature.
+   If all features are passing, consult `quality-document.md` for unimplemented
    domains, then add a new feature entry to `feature_list.json` before starting.
 4. Review recent commits with `git log --oneline -5`.
 5. Run `./init.sh` or `./init.ps1`.
@@ -104,51 +104,27 @@ kb-XXX: short description — status
 
 Examples:
 - `kb-004: document management — create, edit, delete with path safety — passing`
-- `harness: add ESLint; fix lint issues in main.js — feedback 3→4`
+- `harness: add ESLint; fix lint issues in main.js — feedback 3->4`
 
-## Required Artifacts
+## Session Lifecycle
 
-- `feature_list.json`: source of truth for feature state
-- `PROGRESS.md`: session log and current verified status
-- `init.sh` / `init.ps1`: standard startup and verification path
-- `quality-document.md`: quality grades per domain and layer
-- `session-handoff.md`: compact handoff for larger sessions
-
-## Definition Of Done
-
-A feature is done only when all of the following are true:
-
-- the target behavior is implemented
-- the required verification actually ran (npm test passes)
-- evidence is recorded in `feature_list.json` or `PROGRESS.md`
-- the repository remains restartable from the standard startup path
-
-## End Of Session
-
-Before ending a session:
-
-1. Update `PROGRESS.md`.
-2. Update `feature_list.json`.
-3. Update `quality-document.md`.
-4. Record any unresolved risk or blocker.
-5. Commit with a descriptive message once the work is in a safe state.
-6. Leave the repo clean enough for the next session to run `init.sh` or `init.ps1` immediately.
+- **Before closing a session**: Follow the checklist in [docs/session-checklist.md](docs/session-checklist.md).
+  Covers required artifacts, definition of done, end-of-session steps, and pre-commit verification.
 
 ## Recovery
 
 If baseline verification fails when you first run init:
 
-1. Check what changed: git status
-2. Revert unintended changes: git checkout -- .
-3. Re-run init: ./init.sh or ./init.ps1
+1. Check what changed: `git status`
+2. Revert unintended changes: `git checkout -- .`
+3. Re-run init: `./init.sh` or `./init.ps1`
 
 If tests fail after your own changes:
-- Check for stale test artifacts: m data/__test_kb004.md (test.js Test 9 leaves this if it crashed)
-- Re-run: 
-pm test
+- Check for stale test artifacts: `rm data/__test_kb004.md` (test.js Test 9 leaves this if it crashed)
+- Re-run: `npm test`
 
 If dependencies are corrupted:
-- Delete and reinstall: m -rf node_modules && npm install
+- Delete and reinstall: `rm -rf node_modules && npm install`
 
 ## Troubleshooting
 
@@ -161,9 +137,12 @@ If dependencies are corrupted:
 
 ## Further Reading
 
-- `data/Harness Engineering.md` — the five-subsystem harness model
-- `exercises/five-tuple harness audit.md` — completed harness audit with scores
-- `quality-document.md` — quality grades per domain and architectural layer
-- `data/welcome.md` — sample document used for testing
+Read when orienting or investigating:
+- [Harness Engineering](data/Harness%20Engineering.md) — the five-subsystem harness model this repo follows
+- [Five-Tuple Audit](exercises/five-tuple%20harness%20audit.md) — completed harness audit with scores
 
+Read when adding tests or diagnosing failures:
+- [Session Checklist](docs/session-checklist.md) — required artifacts, definition of done, end-of-session steps
 
+Read when starting a new session:
+- [quality-document.md](quality-document.md) — quality grades per domain and architectural layer

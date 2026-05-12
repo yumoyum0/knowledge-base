@@ -10,6 +10,9 @@
 - Renamed claude-progress.md to PROGRESS.md.
 
 ### Actions Taken
+- **SNR audit**: Scored 16 instruction entries against 5 task types. Lowest SNR: Handoff (38%), Verification (44%). Extracted End of Session + Definition of Done + Required Artifacts to docs/session-checklist.md. Added applicability conditions to Further Reading links. AGENTS.md condensed from ~120 to 107 lines.
+- **ACID assessment**: Scored all four dimensions: Atomicity B->B+, Consistency A, Isolation B, Durability A. Added Recovery section to AGENTS.md.
+
 - **ACID assessment**: Scored all four dimensions: Atomicity B→B+, Consistency A, Isolation B, Durability A. Added Recovery section to AGENTS.md with concrete rollback steps for broken baseline, stale artifacts, and dependency corruption.
 - **Knowledge externalization**: 20/20 items in repo (100%). Added structured headers to main.js, preload.js, test.js.
 - **Cold-start test**: All five questions answerable. Created README.md. Added 'no active features' guidance.
@@ -67,6 +70,7 @@ All subsystems at 3/5 or above. All features passing. Consider new features (doc
 
 ### Next Step
 All features passing. Consider adding new features to feature_list.json.
+
 
 
 
