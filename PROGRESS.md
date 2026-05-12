@@ -10,6 +10,10 @@
 - Renamed claude-progress.md to PROGRESS.md.
 
 ### Actions Taken
+- **ACID assessment**: Scored all four dimensions: Atomicity B→B+, Consistency A, Isolation B, Durability A. Added Recovery section to AGENTS.md with concrete rollback steps for broken baseline, stale artifacts, and dependency corruption.
+- **Knowledge externalization**: 20/20 items in repo (100%). Added structured headers to main.js, preload.js, test.js.
+- **Cold-start test**: All five questions answerable. Created README.md. Added 'no active features' guidance.
+
 - **Knowledge externalization quantification**: Scored 20 knowledge items — 19/20 in repo (95%). Closed the last gap by adding test architecture overview to test.js header. Now 20/20 (100%). Added structured IPC contract headers to main.js and preload.js.
 - **Cold-start test**: All five questions answerable. Created README.md. Added 'no active features' guidance to AGENTS.md.
 
@@ -63,6 +67,7 @@ All subsystems at 3/5 or above. All features passing. Consider new features (doc
 
 ### Next Step
 All features passing. Consider adding new features to feature_list.json.
+
 
 
 

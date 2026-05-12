@@ -134,6 +134,22 @@ Before ending a session:
 5. Commit with a descriptive message once the work is in a safe state.
 6. Leave the repo clean enough for the next session to run `init.sh` or `init.ps1` immediately.
 
+## Recovery
+
+If baseline verification fails when you first run init:
+
+1. Check what changed: git status
+2. Revert unintended changes: git checkout -- .
+3. Re-run init: ./init.sh or ./init.ps1
+
+If tests fail after your own changes:
+- Check for stale test artifacts: m data/__test_kb004.md (test.js Test 9 leaves this if it crashed)
+- Re-run: 
+pm test
+
+If dependencies are corrupted:
+- Delete and reinstall: m -rf node_modules && npm install
+
 ## Troubleshooting
 
 | Problem | Fix |
@@ -149,4 +165,5 @@ Before ending a session:
 - `exercises/five-tuple harness audit.md` — completed harness audit with scores
 - `quality-document.md` — quality grades per domain and architectural layer
 - `data/welcome.md` — sample document used for testing
+
 
