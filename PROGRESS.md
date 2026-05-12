@@ -10,6 +10,9 @@
 - Renamed claude-progress.md to PROGRESS.md.
 
 ### Actions Taken
+- **Cold-start test**: Simulated fresh agent — all five questions answerable from repo files. Found two gaps (no README.md, no 'what next' pointer when features done). Created README.md. Updated AGENTS.md Startup Workflow step 3 with guidance for when all features are passing.
+- **Instruction (3→5)**: AGENTS.md expanded to ~109 lines (project structure, architecture, quick start, troubleshooting, commit conventions).
+
 - **Instruction (2→3)**: AGENTS.md enhanced (project overview, tech stack, verification commands, hard constraints, further reading).
 - **Tool (3→4)**: Created project-local .gitconfig with safe.directory. Updated init.sh to export GIT_CONFIG_GLOBAL. Created init.ps1 for Windows PowerShell with same workaround. Added Git Note section to AGENTS.md.
 - **Environment (2→3)**: Added .node-version, .nvmrc (Node 24), and engines field in package.json.
@@ -57,4 +60,5 @@ All subsystems at 3/5 or above. All features passing. Consider new features (doc
 
 ### Next Step
 All features passing. Consider adding new features to feature_list.json.
+
 

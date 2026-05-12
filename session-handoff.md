@@ -32,6 +32,10 @@ Global gitconfig is locked. Both init scripts work around this:
 
 ## Changed Files This Session
 
+- README.md — created (human entry point)
+- exercises/cold-start test.md — completed cold-start test exercise
+
+
 - `AGENTS.md` — enhanced with project, tech stack, verification, hard constraints, git note
 - `.node-version`, `.nvmrc` — created (Node 24)
 - `.gitconfig` — created (safe.directory for git ownership workaround)
@@ -53,4 +57,5 @@ Global gitconfig is locked. Both init scripts work around this:
 1. Run `./init.sh` or `./init.ps1`
 2. Consider new features (document import, indexing, grounded answers, LLM backend)
 3. Optional improvements: TypeScript/JSDoc type checking, Docker config
+
 

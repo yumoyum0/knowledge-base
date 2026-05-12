@@ -52,7 +52,9 @@ Before writing code:
 
 1. Confirm the working directory with `pwd`.
 2. Read `PROGRESS.md` for the latest verified state and next step.
-3. Read `feature_list.json` and choose the highest-priority unfinished feature.
+3. Read `feature_list.json` and choose the highest-priority unfinished feature.\
+   If all features are passing, consult `quality-document.md` for unimplemented\
+   domains, then add a new feature entry to `feature_list.json` before starting.
 4. Review recent commits with `git log --oneline -5`.
 5. Run `./init.sh` or `./init.ps1`.
 6. Confirm baseline verification passes before starting new work.
@@ -147,3 +149,4 @@ Before ending a session:
 - `exercises/five-tuple harness audit.md` — completed harness audit with scores
 - `quality-document.md` — quality grades per domain and architectural layer
 - `data/welcome.md` — sample document used for testing
+
