@@ -1,4 +1,4 @@
-# Quality Document
+﻿# Quality Document
 
 A quality snapshot for each product domain and architectural layer. Both agents and humans can use this document to quickly understand where the codebase is strong and where it needs work.
 
@@ -13,12 +13,22 @@ A quality snapshot for each product domain and architectural layer. Both agents 
 
 ---
 
+## Harness Subsystems
+
+| Subsystem | Grade | Key Gaps | Last Updated |
+|-----------|-------|----------|-------------|
+| Instruction (AGENTS.md) | C → B | Now has project overview, tech stack, verification commands, hard constraints. Could add more detailed docs/ links. | 2026-05-12 |
+| Tool | C | git ownership broken, otherwise functional | 2026-05-12 |
+| Environment | C | Missing .node-version / .nvmrc, no container config | 2026-05-12 |
+| State | B | claude-progress.md and feature_list.json are strong; session-handoff.md not implemented | 2026-05-12 |
+| Feedback | B | 75 assertions passing; missing linting and type checking | 2026-05-12 |
+
 ## Product Domains
 
 | Domain | Grade | Verification | Agent Legibility | Test Stability | Key Gaps | Last Updated |
 |--------|-------|-------------|-----------------|---------------|----------|-------------|
 | Document Import | - | - | - | - | Not yet implemented | - |
-| Document Management | B | All passing | Clear | Stable (74 assertions) | Visual-only verification not possible in headless sandbox | 2026-05-11 |
+| Document Management | B | All passing | Clear | Stable (75 assertions) | Visual-only verification not possible in headless sandbox | 2026-05-11 |
 | Document Indexing | - | - | - | - | Not yet implemented | - |
 | Q&A Flow | B | All passing | Clear | Stable | No real LLM backend; uses keyword matching | 2026-05-11 |
 | Grounded Answers | - | - | - | - | Not yet implemented | - |
@@ -33,6 +43,13 @@ A quality snapshot for each product domain and architectural layer. Both agents 
 | Services | - | - | - | No service layer yet | - |
 
 ## Change History
+
+### 2026-05-12
+
+- Changes: Completed five-tuple harness audit exercise. Enhanced AGENTS.md (added Project section, Verification Commands table, Hard Constraints, Further Reading; fixed End Of Session numbering). Filled out exercise file with full audit results.
+- Domains promoted: Instruction subsystem (C → B)
+- New gaps identified: git ownership mismatch. Missing .node-version. No linting/type checking.
+- Gaps closed: AGENTS.md now self-documents project purpose, tech stack, and verification commands.
 
 ### 2026-05-11
 

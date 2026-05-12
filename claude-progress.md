@@ -1,5 +1,25 @@
 ﻿# Knowledge-Base App — Session Progress
 
+## 2026-05-12
+
+### Current State
+- Ran five-tuple harness audit exercise.
+- Scored all five subsystems; found Instruction (2/5) and Environment (2/5) as weakest.
+- Improved Instruction subsystem: AGENTS.md enhanced from 41 to 55 lines.
+- All 75 tests still passing.
+
+### Actions Taken
+- **AGENTS.md**: Added Project section (purpose + tech stack), Verification Commands table, Hard Constraints section, Further Reading links. Fixed End Of Session numbering.
+- **exercises/five-tuple harness audit.md**: Filled out complete audit with subsystem scores, evidence, improvement applied, and results table.
+- Startup workflow completed: `npm install` (up to date), `npm test` (75 passed, 0 failed).
+
+### Known Limitations
+- git ownership mismatch prevents `git log` and commits (S-1-5-21-...-1022 vs owner S-1-5-21-...-1001; global gitconfig locked).
+- Electron cannot be launched in this headless sandbox environment.
+
+### Next Step
+Environment subsystem is the next lowest-scoring (2/5). Add `.node-version` file to pin Node 24.
+
 ## 2026-05-11
 
 ### Current State
