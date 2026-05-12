@@ -10,6 +10,9 @@
 - Renamed claude-progress.md to PROGRESS.md.
 
 ### Actions Taken
+- **Knowledge externalization quantification**: Scored 20 knowledge items — 19/20 in repo (95%). Closed the last gap by adding test architecture overview to test.js header. Now 20/20 (100%). Added structured IPC contract headers to main.js and preload.js.
+- **Cold-start test**: All five questions answerable. Created README.md. Added 'no active features' guidance to AGENTS.md.
+
 - **Cold-start test**: Simulated fresh agent — all five questions answerable from repo files. Found two gaps (no README.md, no 'what next' pointer when features done). Created README.md. Updated AGENTS.md Startup Workflow step 3 with guidance for when all features are passing.
 - **Instruction (3→5)**: AGENTS.md expanded to ~109 lines (project structure, architecture, quick start, troubleshooting, commit conventions).
 
@@ -60,5 +63,6 @@ All subsystems at 3/5 or above. All features passing. Consider new features (doc
 
 ### Next Step
 All features passing. Consider adding new features to feature_list.json.
+
 
 

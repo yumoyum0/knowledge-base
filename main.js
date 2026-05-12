@@ -1,4 +1,29 @@
-﻿const { app, BrowserWindow, ipcMain } = require('electron');
+﻿/*
+ * main.js — Electron main process
+ *
+ * IPC Channel Contract (6 channels):
+ * ┌──────────────────────┬──────────────────────────────────┬─────────────────────────────┐
+ * │ Channel              │ Signature                        │ Returns                     │
+ * ├──────────────────────┼──────────────────────────────────┼─────────────────────────────┤
+ * │ data:list-files      │ ()                               │ [{name, path}]              │
+ * │ data:read-file       │ (filePath: string)               │ string | null               │
+ * │ data:get-path        │ ()                               │ string (dataDir absolute)   │
+ * │ data:create-file     │ (name: string, content: string)  │ {name, path} | {error}      │
+ * │ data:update-file     │ (filePath: string, content: str) │ {success} | {error}         │
+ * │ data:delete-file     │ (filePath: string)               │ {success} | {error}         │
+ * └──────────────────────┴──────────────────────────────────┴─────────────────────────────┘
+ *
+ * Safety rules:
+ * - create-file: sanitizes name via path.basename(), rejects non-.txt/.md
+ * - update-file / delete-file: validate resolved path stays within dataDir
+ * - read-file: path not validated (renderer passes path from list-files result)
+ * - contextIsolation: true, nodeIntegration: false (never relax)
+ *
+ * Window: 1100x700, min 800x500, title "Knowledge Base"
+ * Data: ./data/ (created on first launch if missing)
+ */
+
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 

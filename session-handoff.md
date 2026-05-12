@@ -59,3 +59,4 @@ Global gitconfig is locked. Both init scripts work around this:
 3. Optional improvements: TypeScript/JSDoc type checking, Docker config
 
 
+

@@ -1,4 +1,39 @@
-﻿// kb-002 verification: document loading from data/ directory
+﻿/*
+ * test.js — Baseline verification suite (no framework, assert()-based)
+ *
+ * Test Map (9 blocks, 75 assertions):
+ * ┌──────────┬─────────────────────────────┬────────────┬──────────────────────────────┐
+ * │ Block    │ What it covers              │ Assertions │ How                           │
+ * ├──────────┼─────────────────────────────┼────────────┼──────────────────────────────┤
+ * │ Test 1   │ data/ directory exists      │          1 │ fs.existsSync + isDirectory  │
+ * │ Test 2   │ File listing logic          │          3 │ Mirrors main.js IPC logic    │
+ * │ Test 3   │ File reading                │          3 │ readFileSync on welcome.md   │
+ * │ Test 4   │ HTML structure              │          6 │ String search on index.html  │
+ * │ Test 5   │ Renderer functions          │          5 │ String search on renderer.js │
+ * │ Test 5b  │ Q&A submission flow         │          7 │ Wire checks + thread safety  │
+ * │ Test 5c  │ Document management (CRUD)  │         12 │ Function presence + API calls│
+ * │ Test 6   │ Preload API surface         │         10 │ String search on preload.js  │
+ * │ Test 7   │ Main process IPC handlers   │         12 │ String search on main.js     │
+ * │ Test 8   │ searchDocument logic        │          8 │ Inline reimplementation      │
+ * │ Test 9   │ CRUD functional             │          7 │ Real fs ops + path-traversal │
+ * │ Summary  │                             │         75 │                              │
+ * └──────────┴─────────────────────────────┴────────────┴──────────────────────────────┘
+ *
+ * Coverage rationale:
+ * - Tests 1-3: verify the data layer (directory, listing, reading)
+ * - Tests 4-7: verify the code structure (HTML, renderer, preload, main)
+ * - Tests 5b-5c: verify specific feature behaviors (Q&A, CRUD)
+ * - Test 8: verify core search algorithm with edge cases (match, no-match, short words, truncation)
+ * - Test 9: verify CRUD with real filesystem ops including path-traversal guard
+ *
+ * Extension guide:
+ * - New feature? Add a new test block (Test 10+) following the existing pattern.
+ * - New IPC channel? Add assertions in Test 6 (preload surface) and Test 7 (main handler).
+ * - New renderer function? Add assertions in Test 5/5b/5c.
+ * - No test framework dependency — pure Node.js with assert() helper.
+ */
+
+// kb-002 verification: document loading from data/ directory
 // kb-003 verification: Q&A submission and response display
 // kb-004 verification: document create, edit, delete
 const fs = require('fs');
@@ -160,9 +195,8 @@ assert(result.matchingLines.length > 0, 'searchDocument finds lines with "sideba
 result = searchDocumentLogic('xyzzy nothing', sampleContent);
 assert(result.matchingLines.length === 0, 'searchDocument returns empty for no matches');
 
-// Short words (鈮? chars) are ignored
+// Short words (<=2 chars) are ignored
 result = searchDocumentLogic('is a to', sampleContent);
-// Short words are extracted but produce no matches (filtered at line-matching stage)
 const shortWords = result.questionWords.filter(w => w.length <= 2);
 assert(shortWords.length === 3, 'short words extracted from question');
 assert(result.matchingLines.length === 0, 'short words produce no matches');
@@ -170,7 +204,6 @@ assert(result.matchingLines.length === 0, 'short words produce no matches');
 // searchDocument truncates to 3 snippets
 const manyMatchContent = 'apple banana\ncherry date\nelderberry fig\ngrape honeydew\nkiwi lemon';
 // 'fruit' won't match these; test with words that do instead
-// "fruit" won't match these, let me use words that match
 result = searchDocumentLogic('apple cherry elderberry grape kiwi', manyMatchContent);
 assert(result.matchingLines.length >= 4, 'searchDocument finds multiple matching lines');
 
