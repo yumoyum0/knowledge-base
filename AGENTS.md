@@ -19,31 +19,6 @@
 Both scripts run `npm install`, `npm test`, and `npm run lint`. They also set up
 `GIT_CONFIG_GLOBAL` to work around a git ownership issue (see Git Note below).
 
-## Project Structure
-
-| File | Role |
-|------|------|
-| `main.js` | Electron main process — window creation, IPC handlers, file system ops |
-| `preload.js` | Context bridge — exposes `kbAPI` to renderer via `contextBridge` |
-| `renderer.js` | Browser-side UI — document list, Q&A, edit mode, CRUD wiring |
-| `index.html` | App shell — sidebar + main panel layout |
-| `styles.css` | All visual styling |
-| `test.js` | Baseline verification — 75 assertions, no framework |
-| `package.json` | Dependencies (Electron 33), scripts, engines |
-| `data/` | User document storage (.txt, .md); created on first launch |
-
-## Architecture
-
-```
-main.js  ←→  preload.js  ←→  renderer.js
-(ipcMain)     (contextBridge)   (kbAPI.*)
-```
-
-- **contextIsolation: true** — renderer cannot access Node.js directly
-- **nodeIntegration: false** — no `require()` in the browser context
-- All data flows through named IPC channels (`data:list-files`, `data:read-file`, etc.)
-- Full IPC contract documented in main.js and preload.js header comments
-
 ## Startup Workflow
 
 Before writing code:
@@ -68,6 +43,31 @@ git -c safe.directory="$PWD" log --oneline -5
 ```
 Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 `.gitconfig` to work around this permanently.
+
+## Project Structure
+
+| File | Role |
+|------|------|
+| `main.js` | Electron main process — window creation, IPC handlers, file system ops |
+| `preload.js` | Context bridge — exposes `kbAPI` to renderer via `contextBridge` |
+| `renderer.js` | Browser-side UI — document list, Q&A, edit mode, CRUD wiring |
+| `index.html` | App shell — sidebar + main panel layout |
+| `styles.css` | All visual styling |
+| `test.js` | Baseline verification — 75 assertions, no framework |
+| `package.json` | Dependencies (Electron 33), scripts, engines |
+| `data/` | User document storage (.txt, .md); created on first launch |
+
+## Architecture
+
+```
+main.js  ←→  preload.js  ←→  renderer.js
+(ipcMain)     (contextBridge)   (kbAPI.*)
+```
+
+- **contextIsolation: true** — renderer cannot access Node.js directly
+- **nodeIntegration: false** — no `require()` in the browser context
+- All data flows through named IPC channels (`data:list-files`, `data:read-file`, etc.)
+- Full IPC contract documented in main.js and preload.js header comments
 
 ## Verification Commands
 

@@ -10,6 +10,9 @@
 - Renamed claude-progress.md to PROGRESS.md.
 
 ### Actions Taken
+- **Lost in the middle verification**: Audited all instruction files for section position. Moved Startup Workflow from middle (line 47, 41%) to top (line 22, 19%). All files under 120 lines — naturally immune to the effect (threshold is 600+).
+- **Progressive disclosure refactor**: AGENTS.md reduced from ~120 to 115 lines with routing structure. Created 3 topic docs.
+
 - **Progressive disclosure refactor**: AGENTS.md reduced from ~120 to 84 lines. Created 3 topic docs: working-conventions.md, recovery.md, session-checklist.md. SNR improved for all 5 task types (+7 to +16 points).
 - **SNR audit**: Scored 16 entries against 5 task types. Extracted low-SNR entries to topic docs.
 
@@ -73,6 +76,7 @@ All subsystems at 3/5 or above. All features passing. Consider new features (doc
 
 ### Next Step
 All features passing. Consider adding new features to feature_list.json.
+
 
 
 
