@@ -1,13 +1,14 @@
-﻿# Session Handoff — 2026-05-12
+﻿# Session Handoff — 2026-05-13
 
 ## Quick State
 
 | What | Status |
 |------|--------|
 | Features (kb-001–004) | All passing |
+| Features (kb-005–008) | Not started |
 | `npm test` | 75/75 |
 | `npm run lint` | 0 errors, 0 warnings |
-| Harness audit | Complete |
+| Directory structure | src/ layers created |
 
 ## Harness Scores
 
@@ -21,42 +22,24 @@
 
 ## Active Work
 
-None. All features complete. Session focused on harness improvements across all five subsystems plus renaming claude-progress.md to PROGRESS.md.
-
-## Git Workaround
-
-Global gitconfig is locked. Both init scripts work around this:
-- `init.sh` exports `GIT_CONFIG_GLOBAL`
-- `init.ps1` sets `$env:GIT_CONFIG_GLOBAL`
-- Or manually: `git -c safe.directory="$PWD" ...`
+Directory refactor and AGENTS.md refinement completed. Ready to begin TypeScript migration and feature implementation.
 
 ## Changed Files This Session
 
-- README.md — created (human entry point)
-- exercises/cold-start test.md — completed cold-start test exercise
+- `src/` — directory structure created with layer READMEs
+- `AGENTS.md` — refined with docs hierarchy, layer boundaries, conventions
+- `feature_list.json` — added kb-005 through kb-008
+- `quality-document.md` — added new domains, layers, directory map
+- `PROGRESS.md` — updated with 2026-05-13 session
 
+## New Docs Available
 
-- `AGENTS.md` — enhanced with project, tech stack, verification, hard constraints, git note
-- `.node-version`, `.nvmrc` — created (Node 24)
-- `.gitconfig` — created (safe.directory for git ownership workaround)
-- `package.json` — added engines field and lint script
-- `eslint.config.mjs` — created
-- `init.sh` — added GIT_CONFIG_GLOBAL export and lint step
-- `init.ps1` — created (Windows equivalent)
-- `main.js` — optional catch bindings
-- `renderer.js` — removed dead assignment
-- `test.js` — removed dead searchDocument call
-- `session-handoff.md` — created
-- `PROGRESS.md` — renamed from claude-progress.md, updated
-- `feature_list.json` — last_updated bumped, garbled chars fixed
-- `exercises/five-tuple harness audit.md` — completed audit
-- `quality-document.md` — updated with Harness Subsystems table
+- `docs/ARCHITECTURE.md` — Electron layers, data flow, import pipeline
+- `docs/PRODUCT.md` — Feature requirements and UI layout
 
 ## Next Session
 
 1. Run `./init.sh` or `./init.ps1`
-2. Consider new features (document import, indexing, grounded answers, LLM backend)
-3. Optional improvements: TypeScript/JSDoc type checking, Docker config
-
-
-
+2. Read `docs/ARCHITECTURE.md` and `docs/PRODUCT.md`
+3. Start kb-005: document import via file picker
+4. Begin TypeScript migration of existing JS files into src/ structure

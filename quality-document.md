@@ -7,9 +7,10 @@ A quality snapshot for each product domain and architectural layer. Both agents 
 **Grading scale:**
 
 - **A**: All verification passing, clean architecture, agent-legible, stable tests
-- **B**: Verification passing, mostly clean, minor gaps in legibility or test coverage
-- **C**: Partially working, known gaps, some code areas hard for agents to understand
+- **B**: Verification passing, mostly clean, minor gaps
+- **C**: Partially working, known gaps
 - **D**: Not working, or major structural issues
+- **--**: Not yet implemented
 
 ---
 
@@ -17,48 +18,69 @@ A quality snapshot for each product domain and architectural layer. Both agents 
 
 | Subsystem | Grade | Key Gaps | Last Updated |
 |-----------|-------|----------|-------------|
-| Instruction (AGENTS.md) | A | ~100 lines: project map, architecture, quick start, troubleshooting, commit conventions, verification, hard constraints | 2026-05-12 |
-| Tool | B | git works via GIT_CONFIG_GLOBAL + .gitconfig; global config still locked | 2026-05-12 |
-| Environment | B | .node-version, .nvmrc, and engines field pin Node 24; no container config | 2026-05-12 |
-| State | A | All five artifacts (PROGRESS.md, feature_list.json, quality-document.md, session-handoff.md, init.sh) present, consistent, and clean | 2026-05-12 |
-| Feedback | B | ESLint (0 errors, 0 warnings) + 75 assertions; no type checking yet | 2026-05-12 |
+| Instruction (AGENTS.md) | A | Routing file with docs hierarchy, layer boundaries, conventions | 2026-05-13 |
+| Tool | B | git works via GIT_CONFIG_GLOBAL; global config locked | 2026-05-12 |
+| Environment | B | .node-version, .nvmrc, engines field; no container config | 2026-05-12 |
+| State | A | All five artifacts present and consistent | 2026-05-12 |
+| Feedback | B | ESLint clean + 75 assertions; no TS type checking yet | 2026-05-12 |
 
 ## Product Domains
 
-| Domain | Grade | Verification | Agent Legibility | Test Stability | Key Gaps | Last Updated |
-|--------|-------|-------------|-----------------|---------------|----------|-------------|
-| Document Import | - | - | - | - | Not yet implemented | - |
-| Document Management | B | All passing | Clear | Stable (75 assertions) | Visual-only verification not possible in headless sandbox | 2026-05-11 |
-| Document Indexing | - | - | - | - | Not yet implemented | - |
-| Q&A Flow | B | All passing | Clear | Stable | No real LLM backend; uses keyword matching | 2026-05-11 |
-| Grounded Answers | - | - | - | - | Not yet implemented | - |
+| Domain | Grade | Verification | Key Gaps | Last Updated |
+|--------|-------|-------------|----------|-------------|
+| Document Import | -- | Not yet implemented | kb-005: file picker import | 2026-05-13 |
+| Document Management | B | All passing (75 assertions) | Current: create/edit/delete. Target: import + metadata view | 2026-05-13 |
+| Document Indexing | -- | Not yet implemented | kb-006: paragraph chunking, index status | 2026-05-13 |
+| Q&A Flow | B | All passing | Current: keyword search. Target: grounded Q&A with citations (kb-007) | 2026-05-13 |
+| Grounded Answers | -- | Not yet implemented | kb-007: citations, confidence scores | 2026-05-13 |
+| Persistence | -- | Not yet implemented | kb-008: structured data store, status bar | 2026-05-13 |
 
 ## Architectural Layers
 
-| Layer | Grade | Boundary Enforcement | Agent Legibility | Key Gaps | Last Updated |
-|-------|-------|---------------------|-----------------|----------|-------------|
-| Main Process | B | contextIsolation + path.basename + startsWith(dataDir) | Clean IPC handler pattern | No file-watch for live reload | 2026-05-11 |
-| Preload | B | contextBridge, no nodeIntegration | Minimal surface, clearly named | None identified | 2026-05-11 |
-| Renderer | B | editMode guard, escapeHtml | Functions grouped by feature | DOM-ready timing risk for event listeners | 2026-05-11 |
-| Services | - | - | - | No service layer yet | - |
+| Layer | Grade | Current | Target | Key Gaps | Last Updated |
+|-------|-------|---------|--------|----------|-------------|
+| Main Process | B | main.js (vanilla JS) | src/main/ (TypeScript + services) | No service layer yet; IPC handlers inline | 2026-05-13 |
+| Preload | B | preload.js (vanilla JS) | src/preload/ (typed bridge) | API surface needs expansion for new features | 2026-05-13 |
+| Renderer | B | renderer.js + index.html (vanilla JS) | src/renderer/ (React 18 + TypeScript + Vite) | No component architecture; no file picker | 2026-05-13 |
+| Services | -- | Not yet implemented | src/services/ (Document, Indexing, QA, Persistence) | All business logic in main.js | 2026-05-13 |
+| Shared Types | -- | Not yet implemented | src/shared/ (IPC channels, interfaces) | No typed IPC contract | 2026-05-13 |
+
+## Directory Structure
+
+```
+solution/
+  src/                    # Target architecture (populated incrementally)
+    main/README.md        # Main process layer
+    preload/README.md     # Preload bridge layer
+    renderer/README.md    # React UI layer
+    services/README.md    # Business logic layer
+    shared/README.md      # IPC channel types
+  docs/                   # Agent-readable documentation
+    ARCHITECTURE.md       # Layer structure, data flow, import pipeline
+    PRODUCT.md            # Feature requirements and UI layout
+    recovery.md           # Baseline repair procedures
+    session-checklist.md  # End-of-session steps
+    working-conventions.md# Working rules + commit format
+  main.js                 # Current main process (→ src/main/)
+  preload.js              # Current preload (→ src/preload/)
+  renderer.js             # Current renderer (→ src/renderer/)
+  index.html              # Current shell (→ src/renderer/)
+  styles.css              # Current styling (→ src/renderer/)
+  test.js                 # Baseline verification
+  data/                   # Document storage
+  ...
+```
 
 ## Change History
 
+### 2026-05-13
+
+- Changes: Created src/ directory structure with layer READMEs (main, preload, renderer, services, shared). Refined AGENTS.md merging current routing file with AGENTS (1).md conventions, ARCHITECTURE.md layer boundaries, and PRODUCT.md features. Added four new features to feature_list.json (kb-005 through kb-008: import, indexing, grounded Q&A, persistence). Updated quality-document with new product domains and architectural layers.
+- New domains added: Document Import, Document Indexing, Grounded Answers, Persistence.
+- New layers added: Services, Shared Types.
+- Gaps identified: No TypeScript migration yet. No React/Vite setup. Service layer not implemented.
+
 ### 2026-05-12
 
-- Changes: Completed five-tuple harness audit. Enhanced AGENTS.md (project, tech stack, verification, hard constraints). Added Node version pinning (.node-version, .nvmrc, engines). Installed ESLint 10 with project-specific config; fixed all lint issues in main.js, renderer.js, test.js (optional catch binding, browser globals, dead assignments). Added npm run lint script.
-- Domains promoted: Instruction (C->A), Tool (C->B), Environment (C->B), Feedback (C->B), State (B->A)
-- New gaps identified: git ownership mismatch. No type checking. No container config. git requires env-var workaround.
-- Gaps closed: AGENTS.md self-documents purpose and verification. Node version pinned. ESLint clean (0/0).
-
-### 2026-05-11
-
-- Changes: All four kb-00x features implemented (shell, document loading, Q&A, document CRUD). Fixed newDocBtn event listener timing by moving into init().
-- Domains promoted: Document Management (→B), Q&A Flow (→B)
-- Domoted: None
-- New gaps identified: Visual verification blocked by headless sandbox. No LLM backend for Q&A. DOM-ready timing risk noted.
-- Gaps closed: IPC handlers for CRUD with path safety. Keyword-based document search. Conversation threading.
-
-
-
-
+- Changes: Completed harness audit (five-tuple, cold-start, knowledge externalization, ACID, SNR, progressive disclosure, lost-in-the-middle). Added ESLint, Node version pinning, session-handoff.md, README.md, Recovery section. Renamed claude-progress.md to PROGRESS.md. Created docs/ topic documents.
+- Domains promoted: Instruction (C→A), Tool (C→B), Environment (C→B), Feedback (C→B), State (B→A).

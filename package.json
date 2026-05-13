@@ -2,11 +2,11 @@
     "name":  "knowledge-base",
     "version":  "0.1.0",
     "description":  "Minimal Electron knowledge-base app",
-    "main":  "main.js",
+    "main":  "src/main/main.js",
     "scripts":  {
                     "start":  "electron .",
                     "test":  "node test.js",
-                    "lint":  "eslint main.js preload.js renderer.js test.js"
+                    "lint":  "eslint src/main/main.js src/preload/preload.js src/renderer/renderer.js test.js"
                 },
     "devDependencies":  {
                             "@eslint/js":  "^10.0.1",

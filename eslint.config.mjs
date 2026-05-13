@@ -7,7 +7,7 @@ export default [
   },
   // Node.js files: main process, preload, test
   {
-    files: ["main.js", "preload.js", "test.js"],
+    files: ["src/main/main.js", "src/preload/preload.js", "test.js"],
     languageOptions: {
       globals: {
         __dirname: "readonly",
@@ -25,7 +25,7 @@ export default [
   },
   // Renderer (browser environment)
   {
-    files: ["renderer.js"],
+    files: ["src/renderer/renderer.js"],
     languageOptions: {
       globals: {
         document: "readonly",
@@ -43,3 +43,4 @@ export default [
     },
   },
 ];
+

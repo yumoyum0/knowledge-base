@@ -80,7 +80,7 @@ if (welcomeFile) {
 
 // --- Test 4: HTML structure ---
 console.log('\n--- Test 4: HTML structure ---');
-const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8');
+const html = fs.readFileSync(path.join(__dirname, 'src', 'renderer', 'index.html'), 'utf-8');
 assert(html.includes('id="doc-list"'), 'HTML has doc-list element');
 assert(html.includes('id="qa-thread"'), 'HTML has qa-thread element');
 assert(html.includes('id="qa-form"'), 'HTML has qa-form element');
@@ -90,7 +90,7 @@ assert(html.includes('id="new-doc-btn"'), 'HTML has new-doc-btn element');
 
 // --- Test 5: renderer.js has required functions ---
 console.log('\n--- Test 5: renderer.js functions ---');
-const renderer = fs.readFileSync(path.join(__dirname, 'renderer.js'), 'utf-8');
+const renderer = fs.readFileSync(path.join(__dirname, 'src', 'renderer', 'renderer.js'), 'utf-8');
 assert(renderer.includes('function loadDocumentList'), 'renderer.js defines loadDocumentList');
 assert(renderer.includes('function selectDocument'), 'renderer.js defines selectDocument');
 assert(renderer.includes('function escapeHtml'), 'renderer.js defines escapeHtml');
@@ -134,7 +134,7 @@ assert(renderer.includes('window.kbAPI.deleteFile'), 'renderer.js calls kbAPI.de
 
 // --- Test 6: preload.js exposes correct API ---
 console.log('\n--- Test 6: preload API surface ---');
-const preload = fs.readFileSync(path.join(__dirname, 'preload.js'), 'utf-8');
+const preload = fs.readFileSync(path.join(__dirname, 'src', 'preload', 'preload.js'), 'utf-8');
 assert(preload.includes("'data:list-files'"), 'preload exposes data:list-files');
 assert(preload.includes("'data:read-file'"), 'preload exposes data:read-file');
 assert(preload.includes('listFiles'), 'preload exposes listFiles method');
@@ -148,7 +148,7 @@ assert(preload.includes('deleteFile'), 'preload exposes deleteFile method');
 
 // --- Test 7: main.js IPC handlers ---
 console.log('\n--- Test 7: main.js IPC handlers ---');
-const mainJs = fs.readFileSync(path.join(__dirname, 'main.js'), 'utf-8');
+const mainJs = fs.readFileSync(path.join(__dirname, 'src', 'main', 'main.js'), 'utf-8');
 assert(mainJs.includes("ipcMain.handle('data:list-files'"), 'main.js registers data:list-files handler');
 assert(mainJs.includes("ipcMain.handle('data:read-file'"), 'main.js registers data:read-file handler');
 assert(mainJs.includes('dataDir'), 'main.js defines dataDir path');
@@ -241,3 +241,4 @@ assert(!path.resolve(outsidePath).startsWith(dataDir), 'path outside dataDir is 
 // --- Summary ---
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===`);
 process.exit(failed > 0 ? 1 : 0);
+

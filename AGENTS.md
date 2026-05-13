@@ -2,9 +2,22 @@
 
 ## Project
 
-**Knowledge-Base**: a minimal Electron desktop app for managing local markdown/text documents with Q&A search.
+**Knowledge-Base**: an Electron desktop app for managing a personal knowledge base. Import text/Markdown documents, index them into searchable chunks, and ask grounded Q&A with citations.
 
-**Tech stack**: Node.js 24.15+, Electron 33.x, vanilla HTML/CSS/JS (no framework).
+**Tech stack**: Node.js 24.15+, Electron 33.x. Current: vanilla JS in src/. Target: TypeScript + React 18 + Vite.
+
+## Docs Hierarchy
+
+Read these before writing any code:
+
+| Order | Document | Purpose |
+|-------|----------|---------|
+| 1 | `docs/ARCHITECTURE.md` | Electron layer structure, data flow, import pipeline |
+| 2 | `docs/PRODUCT.md` | Feature requirements and user-facing behavior |
+| 3 | `feature_list.json` | Current state of all features |
+| 4 | `PROGRESS.md` | Session log and verified status |
+
+When adding features, update the relevant doc before writing code.
 
 ## Quick Start
 
@@ -17,20 +30,36 @@
 ```
 
 Both scripts run `npm install`, `npm test`, and `npm run lint`. They also set up
-`GIT_CONFIG_GLOBAL` to work around a git ownership issue (see Git Note below).
+`GIT_CONFIG_GLOBAL` to work around a git ownership issue.
+
+## Layer Boundaries
+
+```
+src/renderer/  ←→  src/preload/  ←→  src/main/  ←→  src/services/
+(React UI)          (contextBridge)    (ipcMain)      (business logic)
+```
+
+- **Renderer** (`src/renderer/`, currently `renderer.js` at root): React + TypeScript UI. Communicates exclusively through `window.knowledgeBase` API. Never imports Node.js modules.
+- **Preload** (`src/preload/`, currently `preload.js` at root): The ONLY bridge. Uses `contextBridge.exposeInMainWorld`. API surface: `kbAPI.*` (current JS) → `window.knowledgeBase.*` (target TS).
+- **Main** (`src/main/`, currently `main.js` at root): Owns BrowserWindow lifecycle, IPC registration, and all filesystem access via services.
+- **Services** (`src/services/`): Pure business logic. DocumentService, IndexingService, QaService, PersistenceService.
+- **Shared** (`src/shared/`): IPC channel constants and type definitions. Channels defined once, imported by both main and preload.
+
+**Current → Target migration**: Root-level JS files will migrate into `src/` as TypeScript conversion proceeds.
 
 ## Startup Workflow
 
 Before writing code:
 
-1. Confirm the working directory with `pwd`.
-2. Read `PROGRESS.md` for the latest verified state and next step.
-3. Read `feature_list.json` and choose the highest-priority unfinished feature.
+1. Read this file completely.
+2. Read `docs/ARCHITECTURE.md` to understand the layer structure.
+3. Read `docs/PRODUCT.md` to understand feature requirements.
+4. Read `feature_list.json` and choose the highest-priority unfinished feature.
    If all features are passing, consult `quality-document.md` for unimplemented
    domains, then add a new feature entry to `feature_list.json` before starting.
-4. Review recent commits with `git log --oneline -5`.
-5. Run `./init.sh` or `./init.ps1`.
-6. Confirm baseline verification passes before starting new work.
+5. Review recent commits with `git log --oneline -5`.
+6. Run `./init.sh` or `./init.ps1`.
+7. Confirm baseline verification passes before starting new work.
 
 If baseline verification is already failing, fix that first. See
 [docs/recovery.md](docs/recovery.md).
@@ -44,31 +73,6 @@ git -c safe.directory="$PWD" log --oneline -5
 Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 `.gitconfig` to work around this permanently.
 
-## Project Structure
-
-| File | Role |
-|------|------|
-| `main.js` | Electron main process — window creation, IPC handlers, file system ops |
-| `preload.js` | Context bridge — exposes `kbAPI` to renderer via `contextBridge` |
-| `renderer.js` | Browser-side UI — document list, Q&A, edit mode, CRUD wiring |
-| `index.html` | App shell — sidebar + main panel layout |
-| `styles.css` | All visual styling |
-| `test.js` | Baseline verification — 75 assertions, no framework |
-| `package.json` | Dependencies (Electron 33), scripts, engines |
-| `data/` | User document storage (.txt, .md); created on first launch |
-
-## Architecture
-
-```
-main.js  ←→  preload.js  ←→  renderer.js
-(ipcMain)     (contextBridge)   (kbAPI.*)
-```
-
-- **contextIsolation: true** — renderer cannot access Node.js directly
-- **nodeIntegration: false** — no `require()` in the browser context
-- All data flows through named IPC channels (`data:list-files`, `data:read-file`, etc.)
-- Full IPC contract documented in main.js and preload.js header comments
-
 ## Verification Commands
 
 | Command | What it checks |
@@ -78,23 +82,30 @@ main.js  ←→  preload.js  ←→  renderer.js
 | `node --version` | Must be Node 24.x |
 | `npm install` | Dependencies up to date |
 
-## Hard Constraints
+## Conventions
 
-- `contextIsolation: true`, `nodeIntegration: false` — never relax these.
-- All file paths from renderer must be validated against `dataDir` in main process.
-- New filenames must go through `path.basename()` before touching disk.
-- Keep the preload API surface minimal — add new IPC channels only when necessary.
+- **Electron security**: `contextIsolation: true`, `nodeIntegration: false` — never relax.
+- **IPC channels**: Follow pattern `namespace:action` (e.g., `documents:import`, `documents:get-content`). Defined in `src/shared/types.ts` (target).
+- **Path safety**: All renderer-provided paths validated against `dataDir`. New filenames go through `path.basename()`.
+- **TypeScript** (target): Strict mode. No `any` without a comment. Named exports only.
+- **Preload surface**: Minimal. Add new IPC channels only when necessary.
+
+## Working Rules
+
+- Work on one feature at a time.
+- Do not mark a feature complete just because code was added.
+- Keep changes within the selected feature scope.
+- Do not silently change verification rules during implementation.
+- Prefer durable repo artifacts over chat summaries.
+- See [docs/working-conventions.md](docs/working-conventions.md) for commit format and full rules.
 
 ## Topic Docs
 
-Read when writing code or committing:
-- [Working Conventions](docs/working-conventions.md) — working rules + commit conventions
-
-Read when something breaks:
-- [Recovery Procedures](docs/recovery.md) — baseline repair, stale artifacts, dependency reset
-
-Read when closing a session:
-- [Session Checklist](docs/session-checklist.md) — required artifacts, definition of done, end-of-session steps
+| When | Read |
+|------|------|
+| Writing code or committing | [docs/working-conventions.md](docs/working-conventions.md) |
+| Something breaks | [docs/recovery.md](docs/recovery.md) |
+| Closing a session | [docs/session-checklist.md](docs/session-checklist.md) |
 
 ## Troubleshooting
 
@@ -102,14 +113,13 @@ Read when closing a session:
 |---------|-----|
 | `npm test` fails | Check `node --version` (needs 24.x). Delete `node_modules/` and rerun `npm install`. |
 | `git log` fails with dubious ownership | Run `git -c safe.directory="$PWD" log --oneline -5` or source `init.sh` / `init.ps1`. |
-| ESLint errors after code changes | Run `npm run lint` locally before committing. Check `eslint.config.mjs` for missing globals. |
-| Electron won't launch | Visual verification requires a desktop environment. This sandbox is headless. |
+| ESLint errors after code changes | Run `npm run lint` locally. Check `eslint.config.mjs` for missing globals. |
+| Electron won't launch | Visual verification requires a desktop. This sandbox is headless. |
 
 ## Further Reading
 
-Read when orienting or investigating:
-- [Harness Engineering](data/Harness%20Engineering.md) — the five-subsystem harness model
-- [Five-Tuple Audit](exercises/five-tuple%20harness%20audit.md) — completed harness audit with scores
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Electron layers, data flow, import pipeline
+- [docs/PRODUCT.md](docs/PRODUCT.md) — Feature requirements and UI layout
+- [quality-document.md](quality-document.md) — Quality grades per domain and layer
+- [data/Harness Engineering.md](data/Harness%20Engineering.md) — Five-subsystem harness model
 
-Read when planning work:
-- [quality-document.md](quality-document.md) — quality grades per domain and layer

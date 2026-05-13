@@ -1,6 +1,6 @@
 ﻿{
   "project": "knowledge-base",
-  "last_updated": "2026-05-12",
+  "last_updated": "2026-05-13",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -27,77 +27,138 @@
         "Verify a data/ directory is created at project root on first launch."
       ],
       "evidence": [
-        "2026-05-11: All project files created (main.js, preload.js, index.html, renderer.js, styles.css).",
-        "2026-05-11: npm install succeeds (71 packages).",
-        "2026-05-11: npm test passes baseline verification.",
-        "2026-05-11: JS syntax checks pass for main.js, preload.js, renderer.js.",
+        "2026-05-11: All project files created.",
+        "2026-05-11: npm install succeeds. npm test passes baseline verification.",
         "2026-05-11: HTML structure verified -- sidebar, main-panel, doc-list, qa-thread, qa-form all present.",
-        "2026-05-11: data/ directory created; main.js ensures it exists on launch.",
-        "2026-05-11: IPC handlers wired for listing .txt/.md files and reading file content."
+        "2026-05-11: data/ directory created; main.js ensures it exists on launch."
       ],
-      "notes": "Electron window cannot be opened in headless sandbox. Full visual verification requires a desktop environment."
+      "notes": "Electron window cannot be opened in headless sandbox."
     },
     {
       "id": "kb-002",
       "priority": 2,
       "area": "documents",
       "title": "Load and display documents from the local data directory",
-      "user_visible_behavior": "The sidebar shows all .txt and .md files found in the data/ directory. Clicking a document displays its content.",
+      "user_visible_behavior": "The sidebar shows all .txt and .md files. Clicking a document displays its content.",
       "status": "passing",
       "verification": [
-        "Place a .txt or .md file in the data/ directory.",
+        "Place a .txt or .md file in data/.",
         "Open the app.",
-        "Verify the file appears in the sidebar document list.",
-        "Click the file and verify its content loads in the main panel."
+        "Verify the file appears in the sidebar.",
+        "Click the file and verify its content loads."
       ],
       "evidence": [
-        "2026-05-11: Sample document data/welcome.md created for testing.",
-        "2026-05-11: test.js verifies data/ directory, file listing (mirrors IPC logic), file reading, HTML structure, renderer functions, preload API surface, and main.js IPC handlers.",
-        "2026-05-11: npm test passes all 26 assertions for kb-002.",
-        "2026-05-11: loadDocumentList() populates sidebar from data/ directory; selectDocument() reads and displays file content on click."
+        "2026-05-11: Sample document data/welcome.md created.",
+        "2026-05-11: npm test passes. loadDocumentList() and selectDocument() verified."
       ],
-      "notes": "Visual verification (opening Electron window) not possible in headless sandbox. All programmatic tests pass."
+      "notes": "All programmatic tests pass."
     },
     {
       "id": "kb-003",
       "priority": 3,
       "area": "qa",
       "title": "Submit Q&A prompts and display responses",
-      "user_visible_behavior": "The user types a prompt in the Q&A input and submits it. The prompt is echoed in the response area as a conversation thread.",
+      "user_visible_behavior": "User types a prompt in the Q&A input and submits it. Responses appear as a conversation thread.",
       "status": "passing",
       "verification": [
         "Open the app.",
-        "Type a question in the Q&A input and submit.",
+        "Type a question and submit.",
         "Verify the question appears in the response area.",
-        "Type another question and verify both appear as a thread."
+        "Verify the thread accumulates multiple Q&A pairs."
       ],
       "evidence": [
-        "2026-05-11: Replaced placeholder response with searchDocument() that finds relevant document lines by keyword match.",
-        "2026-05-11: Q&A submit handler creates user and response messages; thread accumulates without clearing.",
-        "2026-05-11: npm test passes all 41 assertions including kb-003: renderer Q&A wiring, searchDocument behavior (match, no-match, short-word filtering, multi-line)."
+        "2026-05-11: searchDocument() finds relevant document lines by keyword match.",
+        "2026-05-11: Q&A submit handler creates user and response messages; thread persists.",
+        "2026-05-11: npm test passes including searchDocument edge cases."
       ],
-      "notes": "Visual verification (opening Electron window) not possible in headless sandbox. All programmatic tests pass. searchDocument() returns up to 3 matching document lines based on question keyword overlap."
+      "notes": "searchDocument() returns up to 3 matching lines. No LLM backend."
     },
     {
       "id": "kb-004",
       "priority": 4,
       "area": "documents",
       "title": "Document management: create, edit, and delete documents",
-      "user_visible_behavior": "The user can create new .txt or .md documents from the sidebar, edit existing document content inline in the main panel, and delete documents. All changes persist to the data/ directory and the sidebar refreshes automatically.",
+      "user_visible_behavior": "Create .txt/.md documents from the sidebar, edit content inline, delete with confirmation. Changes persist to data/ and sidebar refreshes.",
       "status": "passing",
       "verification": [
-        "Open the app and verify the sidebar shows a New Document button.",
-        "Create two new documents via the New Document button -- verify both appear in the sidebar and in data/.",
-        "Click a document, toggle edit mode, change its content and save -- verify the file on disk is updated.",
-        "Delete one document via the sidebar -- verify it is removed from the list and from data/."
+        "Open the app. Verify New Document button.",
+        "Create two documents -- verify both appear.",
+        "Edit content and save -- verify file on disk updates.",
+        "Delete one document -- verify removal from list and data/."
       ],
       "evidence": [
-        "2026-05-11: Added IPC handlers: data:create-file (with basename sanitization + .txt/.md check), data:update-file and data:delete-file (both with dataDir boundary validation).",
-        "2026-05-11: Preload exposes createFile, updateFile, deleteFile methods.",
-        "2026-05-11: Renderer: New Document button in sidebar header with prompt(), inline edit mode (textarea + Save/Cancel toolbar), delete with confirm() + sidebar refresh. newDocBtn listener moved into init() for reliable DOM-ready wiring.",
-        "2026-05-11: npm test passes all 74 assertions: CRUD functional tests, path-traversal guard, renderer function checks, preload API surface, main.js IPC registration."
+        "2026-05-11: IPC handlers for create/update/delete with path safety.",
+        "2026-05-11: Preload exposes createFile, updateFile, deleteFile.",
+        "2026-05-11: npm test passes all CRUD + path-traversal tests."
       ],
-      "notes": "Visual verification (opening Electron window) not possible in headless sandbox. All programmatic tests pass. Path-traversal guarded with path.basename and startsWith(dataDir) checks."
+      "notes": "Path-traversal guarded with path.basename and startsWith(dataDir)."
+    },
+    {
+      "id": "kb-005",
+      "priority": 5,
+      "area": "documents",
+      "title": "Document import via file picker",
+      "user_visible_behavior": "User clicks Import button, native file picker opens for .txt/.md files. Selected file is imported: content extracted, metadata recorded, document appears in sidebar list. Maximum 10 MB per file.",
+      "status": "not_started",
+      "verification": [
+        "Click Import button -- verify file picker opens.",
+        "Select a .txt or .md file -- verify it appears in document list.",
+        "Verify document metadata displays (title, filename, size, import date).",
+        "Verify file > 10 MB is rejected with an error message."
+      ],
+      "evidence": [],
+      "notes": "Uses ImportPanel component. IPC channel: documents:import. Requires PersistenceService for content storage."
+    },
+    {
+      "id": "kb-006",
+      "priority": 6,
+      "area": "indexing",
+      "title": "Text indexing with paragraph-aware chunking",
+      "user_visible_behavior": "Documents are split into ~500-character chunks at paragraph boundaries. Chunks stored with metadata (character count, word count). Indexing status tracked per document and globally. User can index individual documents or the full library. Status bar shows real-time index state.",
+      "status": "not_started",
+      "verification": [
+        "Import a document and trigger indexing.",
+        "Verify chunks are created (~500 chars each, paragraph boundaries respected).",
+        "Verify chunk metadata includes character count and word count.",
+        "Verify status bar reflects indexing progress (idle → indexing → ready).",
+        "Verify full-library indexing processes all documents."
+      ],
+      "evidence": [],
+      "notes": "IndexingService with PersistenceService. Chunks stored per-document as JSON. Index meta maps document IDs to chunk IDs."
+    },
+    {
+      "id": "kb-007",
+      "priority": 7,
+      "area": "qa",
+      "title": "Grounded Q&A with citations",
+      "user_visible_behavior": "User asks natural language questions. System retrieves relevant chunks and returns answers with citations pointing to specific document chunks. Confidence score shown (0.85 with citations, 0.30 without). Full Q&A history persists across sessions.",
+      "status": "not_started",
+      "verification": [
+        "Import and index at least two documents.",
+        "Ask a question -- verify answer includes citation to a document chunk.",
+        "Verify confidence score is displayed.",
+        "Close and reopen the app -- verify Q&A history is preserved.",
+        "Ask a question with no relevant documents -- verify low-confidence response."
+      ],
+      "evidence": [],
+      "notes": "QaService with keyword-based retrieval + mock patterns. Q&A history stored in qa-history.json. No LLM integration in this version."
+    },
+    {
+      "id": "kb-008",
+      "priority": 8,
+      "area": "persistence",
+      "title": "Cross-session persistence and status bar",
+      "user_visible_behavior": "All imported documents, index data, and Q&A history persist across application restarts. Document list loads automatically on startup. Status bar shows real-time index status, document count, and last activity timestamp. Data stored in knowledge-base-data/ in the user's application data directory.",
+      "status": "not_started",
+      "verification": [
+        "Import and index several documents.",
+        "Close and reopen the app -- verify all documents are listed.",
+        "Verify index data is preserved (no re-indexing needed for unchanged docs).",
+        "Verify Q&A history is preserved.",
+        "Verify status bar shows correct document count and index status."
+      ],
+      "evidence": [],
+      "notes": "PersistenceService handles all I/O. Data stored in structured directory: documents-meta.json, content/<id>.txt, chunks/<id>.json, index/index-meta.json, qa-history.json."
     }
   ]
 }
