@@ -251,15 +251,19 @@ const ps = new PersistenceService(testDataDir);
 assert(fs.existsSync(path.join(testDataDir, 'chunks')), 'chunks/ directory created');
 assert(fs.existsSync(path.join(testDataDir, 'index')), 'index/ directory created');
 
-// 11c: Index metadata read/write
-const meta = ps.readIndexMeta();
-assert(meta.globalStatus === 'idle', 'default index status is idle');
-meta.globalStatus = 'testing';
-ps.writeIndexMeta(meta);
-const meta2 = ps.readIndexMeta();
-assert(meta2.globalStatus === 'testing', 'index meta write/read round-trips');
-meta2.globalStatus = 'idle';
-ps.writeIndexMeta(meta2);
+// 11c: Index metadata read/write (non-destructive: save and restore original state)
+const originalMeta = ps.readIndexMeta();
+assert(typeof originalMeta.globalStatus === 'string', 'index meta has globalStatus field');
+assert(typeof originalMeta.documents === 'object', 'index meta has documents field');
+
+const testMeta = { globalStatus: 'testing', lastIndexed: new Date().toISOString(), documents: { 'test.md': { status: 'indexed', chunkCount: 1 } } };
+ps.writeIndexMeta(testMeta);
+const readBack = ps.readIndexMeta();
+assert(readBack.globalStatus === 'testing', 'index meta write/read round-trips');
+assert(readBack.documents['test.md'].chunkCount === 1, 'index meta preserves nested document data');
+
+// Restore original state
+ps.writeIndexMeta(originalMeta);
 
 // 11d: IndexingService chunking
 const IndexingService = require(path.join(svcDir, 'IndexingService'));
@@ -345,3 +349,5 @@ assert(mainJs.includes('indexingService.removeDocument'), 'main.js removes index
 // --- Summary ---
 console.log('\n=== Results: ' + passed + ' passed, ' + failed + ' failed ===');
 process.exit(failed > 0 ? 1 : 0);
+
+

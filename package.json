@@ -6,7 +6,8 @@
     "scripts":  {
                     "start":  "electron .",
                     "test":  "node test.js",
-                    "lint":  "eslint src/main/main.js src/preload/preload.js src/renderer/renderer.js test.js"
+                    "lint":  "eslint src/main/main.js src/preload/preload.js src/renderer/renderer.js test.js",
+                    "verify":  "npm run lint \u0026\u0026 npm test"
                 },
     "devDependencies":  {
                             "@eslint/js":  "^10.0.1",

@@ -14,12 +14,16 @@ Read these before writing any code:
 |-------|----------|---------|
 | 1 | `docs/ARCHITECTURE.md` | Electron layer structure, data flow, import pipeline |
 | 2 | `docs/PRODUCT.md` | Feature requirements and user-facing behavior |
-| 3 | `feature_list.json` | Current state of all features |
+| 3 | `feature_list.json` | **Canonical** feature status (authoritative over PROGRESS.md). Also read before starting new work. |
 | 4 | `PROGRESS.md` | Session log and verified status |
+
+`feature_list.json` is the canonical source of truth for feature status. `PROGRESS.md` is the narrative session log. When they disagree, `feature_list.json` wins.
 
 When adding features, update the relevant doc before writing code.
 
 ## Quick Start
+
+**Prerequisite**: Node.js 24.x (`node --version`).
 
 ```bash
 # Linux/macOS
@@ -59,7 +63,7 @@ Before writing code:
    domains, then add a new feature entry to `feature_list.json` before starting.
 5. Review recent commits with `git log --oneline -5`.
 6. Run `./init.sh` or `./init.ps1`.
-7. Confirm baseline verification passes before starting new work.
+7. Confirm baseline verification passes (`npm run verify`) before starting new work.
 
 If baseline verification is already failing, fix that first. See
 [docs/recovery.md](docs/recovery.md).
@@ -77,7 +81,8 @@ Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 
 | Command | What it checks |
 |---------|---------------|
-| `npm test` | 75 assertions across data/, file listing, HTML structure, renderer functions, Q&A, CRUD, preload API, main.js IPC |
+| `npm run verify` | Single-command baseline: runs lint then test. Use before starting new work. |
+| `npm test` | 143 assertions across data/, file listing, HTML structure, renderer functions, Q&A, CRUD, preload API, main.js IPC, indexing |
 | `npm run lint` | ESLint on main.js, preload.js, renderer.js, test.js — 0 errors, 0 warnings |
 | `node --version` | Must be Node 24.x |
 | `npm install` | Dependencies up to date |
@@ -123,4 +128,4 @@ Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 - [docs/PRODUCT.md](docs/PRODUCT.md) — Feature requirements and UI layout
 - [quality-document.md](quality-document.md) — Quality grades per domain and layer
 - [data/Harness Engineering.md](data/Harness%20Engineering.md) — Five-subsystem harness model
-
+- [BOOTSTRAP.md](BOOTSTRAP.md) — Bootstrap contract: start commands, current state, task breakdown

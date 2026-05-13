@@ -161,7 +161,15 @@
                          "evidence":  [
 
                                       ],
-                         "notes":  "QaService with keyword-based retrieval + mock patterns. Q\u0026A history stored in qa-history.json. No LLM integration in this version."
+                         "notes":  "QaService with keyword-based retrieval + mock patterns. Q\u0026A history stored in qa-history.json. No LLM integration in this version.",
+                         "files":  [
+                                       "src/services/QaService.js (create)",
+                                       "src/main/main.js (add IPC handlers)",
+                                       "src/preload/preload.js (expose qa API)",
+                                       "src/renderer/renderer.js (citation display, confidence score)",
+                                       "src/renderer/styles.css (new Q\u0026A styles)",
+                                       "test.js (add Test 12)"
+                                   ]
                      },
                      {
                          "id":  "kb-008",
@@ -180,7 +188,15 @@
                          "evidence":  [
 
                                       ],
-                         "notes":  "PersistenceService handles all I/O. Data stored in structured directory: documents-meta.json, content/\u003cid\u003e.txt, chunks/\u003cid\u003e.json, index/index-meta.json, qa-history.json."
+                         "notes":  "PersistenceService handles all I/O. Data stored in structured directory: documents-meta.json, content/\u003cid\u003e.txt, chunks/\u003cid\u003e.json, index/index-meta.json, qa-history.json.",
+                         "files":  [
+                                       "src/main/main.js (app data dir migration)",
+                                       "src/services/PersistenceService.js (extend I/O)",
+                                       "src/renderer/renderer.js (startup load, status bar enhance)",
+                                       "src/renderer/index.html (status bar markup)",
+                                       "src/renderer/styles.css (status bar styles)",
+                                       "test.js (add Test 13)"
+                                   ]
                      }
                  ]
 }
