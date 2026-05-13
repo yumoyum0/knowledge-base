@@ -16,6 +16,9 @@
         <button id="import-btn" class="sidebar-action-btn" title="Import Document">+ Import</button>
         <button id="new-doc-btn" class="sidebar-action-btn" title="New Document">+ New</button>
       </div>
+      <div class="sidebar-index-header">
+        <button id="index-all-btn" class="sidebar-action-btn index-all-btn" title="Index All Documents">Index All</button>
+      </div>
       <ul id="doc-list" class="doc-list">
         <li class="doc-list-empty">No documents found.</li>
       </ul>
@@ -43,7 +46,12 @@
     </main>
   </div>
 
+  <!-- Status Bar -->
+  <footer id="status-bar">
+    <span id="status-index-state" class="status-item">Index: idle</span>
+    <span id="status-doc-count" class="status-item">Docs: 0</span>
+  </footer>
+
   <script src="renderer.js"></script>
 </body>
 </html>
-

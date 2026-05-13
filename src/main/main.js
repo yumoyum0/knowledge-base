@@ -1,18 +1,22 @@
 ﻿/*
  * main.js — Electron main process
  *
- * IPC Channel Contract (7 channels):
- * ┌──────────────────────┬──────────────────────────────────┬─────────────────────────────┐
- * │ Channel              │ Signature                        │ Returns                     │
- * ├──────────────────────┼──────────────────────────────────┼─────────────────────────────┤
- * │ data:list-files      │ ()                               │ [{name, path, ...meta}]     │
- * │ data:read-file       │ (filePath: string)               │ string | null               │
- * │ data:get-path        │ ()                               │ string (dataDir absolute)   │
- * │ data:create-file     │ (name: string, content: string)  │ {name, path} | {error}      │
- * │ data:update-file     │ (filePath: string, content: str) │ {success} | {error}         │
- * │ data:delete-file     │ (filePath: string)               │ {success} | {error}         │
- * │ data:import-file     │ ()                               │ {name, path, size, ...} | null │
- * └──────────────────────┴──────────────────────────────────┴─────────────────────────────┘
+ * IPC Channel Contract (11 channels):
+ * ┌───────────────────────────┬───────────────────────────────────┬─────────────────────────────┐
+ * │ Channel                   │ Signature                         │ Returns                     │
+ * ├───────────────────────────┼───────────────────────────────────┼─────────────────────────────┤
+ * │ data:list-files           │ ()                                │ [{name, path, ...meta}]     │
+ * │ data:read-file            │ (filePath: string)                │ string | null               │
+ * │ data:get-path             │ ()                                │ string (dataDir absolute)   │
+ * │ data:create-file          │ (name: string, content: string)   │ {name, path} | {error}      │
+ * │ data:update-file          │ (filePath: string, content: str)  │ {success} | {error}         │
+ * │ data:delete-file          │ (filePath: string)                │ {success} | {error}         │
+ * │ data:import-file          │ ()                                │ {name, path, size, ...} | null │
+ * │ indexing:start-single     │ (filePath, docName)               │ {success, chunks, status}   │
+ * │ indexing:start-all        │ ()                                │ {success, results, status}  │
+ * │ indexing:get-status       │ ()                                │ {globalStatus, documents}   │
+ * │ indexing:get-chunks       │ (docName)                         │ [{id, text, charCount, ...}]│
+ * └───────────────────────────┴───────────────────────────────────┴─────────────────────────────┘
  *
  * Safety rules:
  * - create-file / import-file: sanitizes name via path.basename(), rejects non-.txt/.md
@@ -23,6 +27,7 @@
  * Window: 1100x700, min 800x500, title "Knowledge Base"
  * Data: ./data/ (created on first launch if missing)
  * Metadata: data/documents-meta.json
+ * Chunks: data/chunks/<doc>.json, Index meta: data/index/index-meta.json
  */
 
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
@@ -35,6 +40,11 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
+// Initialize services
+const PersistenceService = require('../services/PersistenceService');
+const IndexingService = require('../services/IndexingService');
+const persistence = new PersistenceService(dataDir);
+const indexingService = new IndexingService(persistence);
 const META_PATH = path.join(dataDir, 'documents-meta.json');
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
@@ -139,7 +149,7 @@ ipcMain.handle('data:import-file', async () => {
     const destPath = path.join(dataDir, safeName);
 
     if (fs.existsSync(destPath)) {
-      return { error: `"${safeName}" already exists in the library.` };
+      return { error: '"' + safeName + '" already exists in the library.' };
     }
 
     fs.copyFileSync(sourcePath, destPath);
@@ -162,8 +172,7 @@ ipcMain.handle('data:import-file', async () => {
       importDate: importDate,
       indexed: false
     };
-  } catch (_err) {
-    return { error: _err.message };
+  } catch { return { error: 'Failed to read index status' };
   }
 });
 
@@ -192,8 +201,7 @@ ipcMain.handle('data:create-file', async (_event, name, content) => {
     }
 
     return { name: safeName, path: filePath };
-  } catch (_err) {
-    return { error: _err.message };
+  } catch { return { error: 'Failed to read index status' };
   }
 });
 
@@ -218,8 +226,7 @@ ipcMain.handle('data:update-file', async (_event, filePath, content) => {
     }
 
     return { success: true };
-  } catch (_err) {
-    return { error: _err.message };
+  } catch { return { error: 'Failed to read index status' };
   }
 });
 
@@ -243,9 +250,107 @@ ipcMain.handle('data:delete-file', async (_event, filePath) => {
       saveMeta(meta);
     }
 
+    // Remove index data
+    indexingService.removeDocument(name);
+
     return { success: true };
+  } catch { return { error: 'Failed to read index status' };
+  }
+});
+
+// --- IPC: Indexing ---
+
+// Index a single document
+ipcMain.handle('indexing:start-single', async (_event, filePath, docName) => {
+  try {
+    const resolved = path.resolve(filePath);
+    if (!resolved.startsWith(dataDir)) {
+      return { error: 'Access denied' };
+    }
+    if (!fs.existsSync(resolved)) {
+      return { error: 'File not found' };
+    }
+
+    // Update status to indexing
+    let indexMeta = persistence.readIndexMeta();
+    indexMeta.globalStatus = 'indexing';
+    indexMeta.documents[docName] = { status: 'indexing', chunkCount: 0, lastIndexed: null };
+    persistence.writeIndexMeta(indexMeta);
+
+    const content = fs.readFileSync(resolved, 'utf-8');
+    const chunks = indexingService.indexDocument(docName, content);
+
+    // Update document metadata
+    const meta = loadMeta();
+    if (meta[docName]) {
+      meta[docName].indexed = true;
+      saveMeta(meta);
+    }
+
+    // Get updated status
+    indexMeta = persistence.readIndexMeta();
+    return { success: true, chunks: chunks, status: indexMeta };
   } catch (_err) {
+    // Record error in index meta
+    const indexMeta = persistence.readIndexMeta();
+    indexMeta.documents[docName] = { status: 'error', error: _err.message };
+    indexMeta.globalStatus = 'error';
+    persistence.writeIndexMeta(indexMeta);
     return { error: _err.message };
+  }
+});
+
+// Index all documents
+ipcMain.handle('indexing:start-all', async () => {
+  try {
+    // Update status to indexing
+    let indexMeta = persistence.readIndexMeta();
+    indexMeta.globalStatus = 'indexing';
+    persistence.writeIndexMeta(indexMeta);
+
+    const entries = fs.readdirSync(dataDir, { withFileTypes: true });
+    const docs = entries
+      .filter(e => e.isFile() && (e.name.endsWith('.txt') || e.name.endsWith('.md')));
+
+    const results = [];
+    for (const doc of docs) {
+      try {
+        const filePath = path.join(dataDir, doc.name);
+        const content = fs.readFileSync(filePath, 'utf-8');
+        const chunks = indexingService.indexDocument(doc.name, content);
+
+        const meta = loadMeta();
+        if (meta[doc.name]) {
+          meta[doc.name].indexed = true;
+          saveMeta(meta);
+        }
+
+        results.push({ name: doc.name, chunkCount: chunks.length, error: null });
+      } catch (err) {
+        results.push({ name: doc.name, chunkCount: 0, error: err.message });
+      }
+    }
+
+    indexMeta = persistence.readIndexMeta();
+    return { success: true, results: results, status: indexMeta };
+  } catch { return { error: 'Failed to read index status' };
+  }
+});
+
+// Get index status
+ipcMain.handle('indexing:get-status', async () => {
+  try {
+    return persistence.readIndexMeta();
+  } catch { return { error: 'Failed to read index status' };
+  }
+});
+
+// Get chunks for a document
+ipcMain.handle('indexing:get-chunks', async (_event, docName) => {
+  try {
+    const chunks = indexingService.getChunks(docName);
+    return chunks || [];
+  } catch { return [];
   }
 });
 
@@ -260,3 +365,5 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+

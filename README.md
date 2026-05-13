@@ -12,7 +12,7 @@ A minimal Electron desktop app for managing local markdown/text documents with Q
 ./init.ps1
 ```
 
-Both scripts install dependencies, run tests (75 assertions), and run the linter.
+Both scripts install dependencies, run tests (143 assertions), and run the linter.
 
 To launch the app: `npm start`
 
@@ -22,4 +22,4 @@ See [AGENTS.md](AGENTS.md) — the agent-oriented project map with architecture,
 
 ## Status
 
-All features passing. 75/75 tests, 0 lint errors. See [PROGRESS.md](PROGRESS.md) for session history.
+All features passing (kb-001 through kb-006). 143/143 tests, 0 lint errors. See [PROGRESS.md](PROGRESS.md) for session history.

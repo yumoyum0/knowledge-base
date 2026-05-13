@@ -6,6 +6,9 @@ const qaForm = document.getElementById('qa-form');
 const qaInput = document.getElementById('qa-input');
 const dataPathEl = document.getElementById('data-path');
 const newDocBtn = document.getElementById('new-doc-btn');
+const indexAllBtn = document.getElementById('index-all-btn');
+const statusIndexState = document.getElementById('status-index-state');
+const statusDocCount = document.getElementById('status-doc-count');
 
 let currentDoc = null;
 let editMode = false;
@@ -17,6 +20,7 @@ async function loadDocumentList() {
 
   if (files.length === 0) {
     docList.innerHTML = '<li class="doc-list-empty">No documents found.</li>';
+    updateStatusBar(files.length);
     return;
   }
 
@@ -42,6 +46,8 @@ async function loadDocumentList() {
 
     docList.appendChild(li);
   });
+
+  updateStatusBar(files.length);
 }
 
 // --- Select a document ---
@@ -65,24 +71,27 @@ function renderDocumentView(file, content) {
   // Toolbar
   const toolbar = document.createElement('div');
   toolbar.className = 'doc-toolbar';
-  toolbar.innerHTML = `
-    <span class="doc-toolbar-title">${escapeHtml(file.name)}</span>
-    <div class="doc-toolbar-actions">
-      <button class="doc-action-btn doc-edit-btn" title="Edit document">Edit</button>
-      <button class="doc-action-btn doc-delete-btn-danger" title="Delete document">Delete</button>
-    </div>
-  `;
+  toolbar.innerHTML = '<span class="doc-toolbar-title">' + escapeHtml(file.name) + '</span>' +
+    '<div class="doc-toolbar-actions">' +
+    '<button class="doc-action-btn doc-index-btn" title="Index this document">Index</button>' +
+    '<button class="doc-action-btn doc-edit-btn" title="Edit document">Edit</button>' +
+    '<button class="doc-action-btn doc-delete-btn-danger" title="Delete document">Delete</button>' +
+    '</div>';
   toolbar.querySelector('.doc-edit-btn').addEventListener('click', () => enterEditMode(file, content));
   toolbar.querySelector('.doc-delete-btn-danger').addEventListener('click', () => deleteDocument(file));
+  toolbar.querySelector('.doc-index-btn').addEventListener('click', () => indexSingleDocument(file));
   qaThread.appendChild(toolbar);
 
-    // Metadata
+  // Metadata
   if (file.size) {
     const metaDiv = document.createElement('div');
     metaDiv.className = 'qa-document-meta';
     const sizeKB = (file.size / 1024).toFixed(1);
     const importDate = file.importDate ? new Date(file.importDate).toLocaleDateString() : 'unknown';
-    metaDiv.innerHTML = `<span>Size: ${sizeKB} KB</span> &middot; <span>Imported: ${importDate}</span>`;
+    const indexed = file.indexed ? 'Indexed' : 'Not indexed';
+    metaDiv.innerHTML = '<span>Size: ' + sizeKB + ' KB</span> &middot; ' +
+      '<span>Imported: ' + importDate + '</span> &middot; ' +
+      '<span class="meta-indexed">' + indexed + '</span>';
     qaThread.appendChild(metaDiv);
   }
 
@@ -90,7 +99,7 @@ function renderDocumentView(file, content) {
   if (content !== null && content.length > 0) {
     const contentDiv = document.createElement('div');
     contentDiv.className = 'qa-document-view';
-    contentDiv.innerHTML = `<pre>${escapeHtml(content)}</pre>`;
+    contentDiv.innerHTML = '<pre>' + escapeHtml(content) + '</pre>';
     qaThread.appendChild(contentDiv);
   } else {
     const emptyDiv = document.createElement('div');
@@ -98,6 +107,74 @@ function renderDocumentView(file, content) {
     emptyDiv.textContent = '(empty document)';
     qaThread.appendChild(emptyDiv);
   }
+
+  // Load and show chunks if available
+  loadChunksForDocument(file.name);
+}
+
+// --- Load and display chunks ---
+async function loadChunksForDocument(docName) {
+  const chunks = await window.kbAPI.getChunks(docName);
+  if (!chunks || chunks.length === 0) return;
+
+  const chunksContainer = document.createElement('div');
+  chunksContainer.className = 'chunks-container';
+
+  const header = document.createElement('div');
+  header.className = 'chunks-header';
+  header.innerHTML = '<strong>Chunks</strong> (' + chunks.length + ' total)';
+  chunksContainer.appendChild(header);
+
+  chunks.forEach(chunk => {
+    const chunkDiv = document.createElement('div');
+    chunkDiv.className = 'chunk-item';
+    chunkDiv.innerHTML =
+      '<div class="chunk-meta">Chunk #' + (chunk.index + 1) +
+      ' &middot; ' + chunk.charCount + ' chars &middot; ' + chunk.wordCount + ' words</div>' +
+      '<div class="chunk-text">' + escapeHtml(chunk.text) + '</div>';
+    chunksContainer.appendChild(chunkDiv);
+  });
+
+  qaThread.appendChild(chunksContainer);
+}
+
+// --- Index a single document ---
+async function indexSingleDocument(file) {
+  const result = await window.kbAPI.indexSingle(file.path, file.name);
+  if (result.error) {
+    alert('Indexing failed: ' + result.error);
+    return;
+  }
+  // Refresh document view
+  const content = await window.kbAPI.readFile(file.path);
+  file.indexed = true;
+  renderDocumentView(file, content);
+  updateStatusBar();
+}
+
+// --- Index all documents ---
+async function indexAllDocuments() {
+  indexAllBtn.disabled = true;
+  indexAllBtn.textContent = 'Indexing...';
+  const result = await window.kbAPI.indexAll();
+  indexAllBtn.disabled = false;
+  indexAllBtn.textContent = 'Index All';
+
+  if (result.error) {
+    alert('Indexing failed: ' + result.error);
+    return;
+  }
+
+  // Refresh document list and current view
+  await loadDocumentList();
+  if (currentDoc) {
+    const files = await window.kbAPI.listFiles();
+    const refreshed = files.find(f => f.name === currentDoc.name);
+    if (refreshed) {
+      await selectDocument(refreshed);
+    }
+  }
+  updateStatusBar();
 }
 
 // --- Enter edit mode ---
@@ -107,13 +184,11 @@ function enterEditMode(file, content) {
 
   const toolbar = document.createElement('div');
   toolbar.className = 'doc-toolbar';
-  toolbar.innerHTML = `
-    <span class="doc-toolbar-title">Editing: ${escapeHtml(file.name)}</span>
-    <div class="doc-toolbar-actions">
-      <button class="doc-action-btn doc-save-btn">Save</button>
-      <button class="doc-action-btn doc-cancel-btn">Cancel</button>
-    </div>
-  `;
+  toolbar.innerHTML = '<span class="doc-toolbar-title">Editing: ' + escapeHtml(file.name) + '</span>' +
+    '<div class="doc-toolbar-actions">' +
+    '<button class="doc-action-btn doc-save-btn">Save</button>' +
+    '<button class="doc-action-btn doc-cancel-btn">Cancel</button>' +
+    '</div>';
   toolbar.querySelector('.doc-save-btn').addEventListener('click', () => saveEdit(file));
   toolbar.querySelector('.doc-cancel-btn').addEventListener('click', () => cancelEdit(file, content));
   qaThread.appendChild(toolbar);
@@ -133,7 +208,7 @@ async function saveEdit(file) {
   const newContent = textarea.value;
   const result = await window.kbAPI.updateFile(file.path, newContent);
   if (result.error) {
-    alert(`Failed to save: ${result.error}`);
+    alert('Failed to save: ' + result.error);
     return;
   }
   editMode = false;
@@ -151,7 +226,7 @@ async function importDocument() {
   const result = await window.kbAPI.importFile();
   if (!result) return; // user cancelled
   if (result.error) {
-    alert(`Import failed: ${result.error}`);
+    alert('Import failed: ' + result.error);
     return;
   }
   await loadDocumentList();
@@ -173,7 +248,7 @@ async function createNewDocument() {
   }
   const result = await window.kbAPI.createFile(name, '');
   if (result.error) {
-    alert(`Failed to create: ${result.error}`);
+    alert('Failed to create: ' + result.error);
     return;
   }
   await loadDocumentList();
@@ -187,11 +262,11 @@ async function createNewDocument() {
 
 // --- Delete document ---
 async function deleteDocument(file) {
-  const confirmed = confirm(`Delete "${file.name}"? This cannot be undone.`);
+  const confirmed = confirm('Delete "' + file.name + '"? This cannot be undone.');
   if (!confirmed) return;
   const result = await window.kbAPI.deleteFile(file.path);
   if (result.error) {
-    alert(`Failed to delete: ${result.error}`);
+    alert('Failed to delete: ' + result.error);
     return;
   }
   if (currentDoc && currentDoc.path === file.path) {
@@ -214,7 +289,7 @@ qaForm.addEventListener('submit', async (e) => {
   // Add user question
   const userMsg = document.createElement('div');
   userMsg.className = 'qa-message qa-user';
-  userMsg.innerHTML = `<strong>Q:</strong> ${escapeHtml(question)}`;
+  userMsg.innerHTML = '<strong>Q:</strong> ' + escapeHtml(question);
   qaThread.appendChild(userMsg);
 
   // Generate response
@@ -224,7 +299,7 @@ qaForm.addEventListener('submit', async (e) => {
     if (content) {
       answer = searchDocument(question, content);
     } else {
-      answer = `Could not read "${escapeHtml(currentDoc.name)}".`;
+      answer = 'Could not read "' + escapeHtml(currentDoc.name) + '".';
     }
   } else {
     answer = 'No document selected. Please select a document from the sidebar first.';
@@ -232,7 +307,7 @@ qaForm.addEventListener('submit', async (e) => {
 
   const responseMsg = document.createElement('div');
   responseMsg.className = 'qa-message qa-response';
-  responseMsg.innerHTML = `<strong>A:</strong> ${answer}`;
+  responseMsg.innerHTML = '<strong>A:</strong> ' + answer;
   qaThread.appendChild(responseMsg);
 
   // Scroll to bottom
@@ -264,9 +339,28 @@ function searchDocument(question, content) {
 
   // Show up to 3 most relevant lines
   const snippets = matchingLines.slice(0, 3).map(l => {
-    return `<span class="qa-snippet-line">Line ${l.index + 1}:</span> ${escapeHtml(l.text)}`;
+    return '<span class="qa-snippet-line">Line ' + (l.index + 1) + ':</span> ' + escapeHtml(l.text);
   });
-  return `Found ${matchingLines.length} matching line(s) in "${escapeHtml(currentDoc.name)}":<br><br>${snippets.join('<br>')}`;
+  return 'Found ' + matchingLines.length + ' matching line(s) in "' + escapeHtml(currentDoc.name) + '":<br><br>' + snippets.join('<br>');
+}
+
+// --- Status bar ---
+async function updateStatusBar(docCount) {
+  // Update index status
+  try {
+    const status = await window.kbAPI.getIndexStatus();
+    if (status && status.globalStatus) {
+      statusIndexState.textContent = 'Index: ' + status.globalStatus;
+      statusIndexState.className = 'status-item status-' + status.globalStatus;
+    }
+  } catch {
+    statusIndexState.textContent = 'Index: unknown';
+    statusIndexState.className = 'status-item';
+  }
+
+  // Update document count
+  const count = docCount !== undefined ? docCount : (await window.kbAPI.listFiles()).length;
+  statusDocCount.textContent = 'Docs: ' + count;
 }
 
 // --- Utility ---
@@ -279,7 +373,7 @@ function escapeHtml(text) {
 // --- Init ---
 async function init() {
   const dataPath = await window.kbAPI.getDataPath();
-  dataPathEl.textContent = `Data: ${dataPath}`;
+  dataPathEl.textContent = 'Data: ' + dataPath;
   await loadDocumentList();
 
   if (newDocBtn) {
@@ -288,8 +382,11 @@ async function init() {
   if (importBtn) {
     importBtn.addEventListener('click', importDocument);
   }
+  if (indexAllBtn) {
+    indexAllBtn.addEventListener('click', indexAllDocuments);
+  }
+
+  updateStatusBar();
 }
 
 init();
-
-

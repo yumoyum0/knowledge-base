@@ -30,7 +30,7 @@ A quality snapshot for each product domain and architectural layer. Both agents 
 |--------|-------|-------------|----------|-------------|
 | Document Import | B | All passing (87 assertions) | kb-005: native dialog, metadata, 10 MB limit | 2026-05-13 |
 | Document Management | A | All passing (87 assertions) | Create/edit/delete + import with metadata | 2026-05-13 |
-| Document Indexing | -- | Not yet implemented | kb-006: paragraph chunking, index status | 2026-05-13 |
+| Document Indexing | B | All passing (143 assertions) | kb-006: paragraph chunking, ~500 chars, chunk metadata, index status, status bar | 2026-05-13 |
 | Q&A Flow | B | All passing | Current: keyword search. Target: grounded Q&A with citations (kb-007) | 2026-05-13 |
 | Grounded Answers | -- | Not yet implemented | kb-007: citations, confidence scores | 2026-05-13 |
 | Persistence | -- | Not yet implemented | kb-008: structured data store, status bar | 2026-05-13 |
@@ -42,7 +42,7 @@ A quality snapshot for each product domain and architectural layer. Both agents 
 | Main Process | B | main.js (vanilla JS) | src/main/ (TypeScript + services) | No service layer yet; IPC handlers inline | 2026-05-13 |
 | Preload | B | preload.js (vanilla JS) | src/preload/ (typed bridge) | API surface needs expansion for new features | 2026-05-13 |
 | Renderer | B | renderer.js + index.html (vanilla JS) | src/renderer/ (React 18 + TypeScript + Vite) | No component architecture; no file picker | 2026-05-13 |
-| Services | -- | Not yet implemented | src/services/ (Document, Indexing, QA, Persistence) | All business logic in main.js | 2026-05-13 |
+| Services | B | IndexingService + PersistenceService implemented | Indexing and persistence services created; DocumentService and QaService pending | 2026-05-13 |
 | Shared Types | -- | Not yet implemented | src/shared/ (IPC channels, interfaces) | No typed IPC contract | 2026-05-13 |
 
 ## Directory Structure
@@ -85,3 +85,4 @@ solution/
 
 - Changes: Completed harness audit (five-tuple, cold-start, knowledge externalization, ACID, SNR, progressive disclosure, lost-in-the-middle). Added ESLint, Node version pinning, session-handoff.md, README.md, Recovery section. Renamed claude-progress.md to PROGRESS.md. Created docs/ topic documents.
 - Domains promoted: Instruction (C→A), Tool (C→B), Environment (C→B), Feedback (C→B), State (B→A).
+

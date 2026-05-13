@@ -7,12 +7,14 @@
 
 :root {
   --sidebar-width: 260px;
+  --status-bar-height: 28px;
   --color-bg: #f8f9fa;
   --color-sidebar: #1e1e2e;
   --color-sidebar-text: #cdd6f4;
   --color-sidebar-hover: #313244;
   --color-sidebar-active: #45475a;
   --color-accent: #89b4fa;
+  --color-accent-green: #a6e3a1;
   --color-surface: #ffffff;
   --color-text: #1e1e2e;
   --color-text-muted: #6c7086;
@@ -20,6 +22,8 @@
   --color-user-msg: #e6f0ff;
   --color-response-msg: #f0f0f0;
   --color-system-msg: #fff3cd;
+  --color-status-bar: #1e1e2e;
+  --color-status-text: #cdd6f4;
   --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
   --font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
 }
@@ -32,10 +36,16 @@ html, body {
   background: var(--color-bg);
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+}
+
 /* --- Layout --- */
 #app {
   display: flex;
-  height: 100vh;
+  flex: 1;
+  min-height: 0;
 }
 
 /* --- Sidebar --- */
@@ -65,6 +75,11 @@ html, body {
   color: #fff;
 }
 
+.sidebar-index-header {
+  padding: 4px 16px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
 .sidebar-action-btn {
   background: var(--color-accent);
   color: #1e1e2e;
@@ -80,6 +95,18 @@ html, body {
 
 .sidebar-action-btn:hover {
   opacity: 0.85;
+}
+
+.index-all-btn {
+  width: 100%;
+  background: var(--color-accent-green);
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+.index-all-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .doc-list {
@@ -214,6 +241,15 @@ html, body {
   color: var(--color-text);
 }
 
+.doc-index-btn {
+  color: #40a02b;
+  border-color: #a6e3a1;
+}
+
+.doc-index-btn:hover {
+  background: #f0faf0;
+}
+
 .doc-save-btn {
   background: var(--color-accent);
   color: #1e1e2e;
@@ -275,6 +311,46 @@ html, body {
   color: var(--color-text-muted);
   font-style: italic;
   text-align: center;
+}
+
+/* --- Chunks Display --- */
+.chunks-container {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chunks-header {
+  padding: 8px 14px;
+  background: #f0f0f5;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.chunk-item {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.chunk-item:last-child {
+  border-bottom: none;
+}
+
+.chunk-meta {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.chunk-text {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--color-text);
 }
 
 /* --- Q&A Thread --- */
@@ -391,4 +467,44 @@ html, body {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   margin-bottom: 8px;
+}
+
+.meta-indexed {
+  color: #40a02b;
+  font-weight: 600;
+}
+
+/* --- Status Bar --- */
+#status-bar {
+  height: var(--status-bar-height);
+  min-height: var(--status-bar-height);
+  background: var(--color-status-bar);
+  color: var(--color-status-text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-size: 11px;
+  font-weight: 500;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.status-item {
+  padding: 0 8px;
+}
+
+.status-idle {
+  color: var(--color-text-muted);
+}
+
+.status-indexing {
+  color: #f9e2af;
+}
+
+.status-ready {
+  color: var(--color-accent-green);
+}
+
+.status-error {
+  color: #f38ba8;
 }

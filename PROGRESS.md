@@ -1,28 +1,27 @@
-# Knowledge-Base App ? Session Progress
+﻿# Knowledge-Base App — Session Progress
 
-## 2026-05-13
+## 2026-05-13 (kb-006)
 
 ### Current State
-- kb-005 (document import via file picker) implemented and passing.
-- All 87 tests passing. ESLint: 0 errors, 0 warnings.
-- src/ directory structure in place reflecting Electron layer boundaries.
-- AGENTS.md refined with docs hierarchy, layer boundaries, and conventions.
-- Features kb-006?008 (indexing, grounded Q&A, persistence) queued.
+- kb-006 implemented: Text indexing with paragraph-aware chunking.
+- 143 tests passing. ESLint: 0 errors, 0 warnings.
+- kb-001 through kb-006 all passing.
+- Feature kb-007 (grounded Q&A with citations) and kb-008 (persistence + status bar) queued.
 
 ### Actions Taken
-- **File migration**: Moved main.js -> src/main/, preload.js -> src/preload/, renderer.js + index.html + styles.css -> src/renderer/. Updated all path references in package.json, test.js, eslint.config.mjs, and main.js. All 75 tests pass, lint clean.
-- **Directory refactor**: Created src/main/, src/preload/, src/renderer/, src/services/, src/shared/ with layer READMEs.
-- **AGENTS.md refinement**: Merged current routing file with AGENTS (1).md conventions. Added docs hierarchy. Added Electron layer boundaries with current/target mapping. Added TypeScript conventions.
-- **feature_list.json**: Added kb-005 through kb-008. kb-005 now passing.
-- **kb-005 implementation**: Added data:import-file IPC handler with native dialog, 10 MB limit, metadata store (documents-meta.json), importFile preload API, Import button in sidebar, importDocument() renderer function, metadata display, Test 10 (12 assertions), CSS styling for metadata bar.
-- **quality-document.md**: Added Services and Shared Types architectural layers. Added Document Import, Document Indexing, Grounded Answers, and Persistence product domains. Added directory structure map.
-- **docs/AGENTS (1).md**: Removed (duplicate; content merged into AGENTS.md).
+- Created src/services/PersistenceService.js — atomic JSON/text I/O for chunks/ and index/ directories.
+- Created src/services/IndexingService.js — paragraph-aware chunking (~500 chars), sentence-level fallback for long paragraphs.
+- Added 4 IPC handlers: indexing:start-single, indexing:start-all, indexing:get-status, indexing:get-chunks.
+- Updated preload with indexSingle, indexAll, getIndexStatus, getChunks methods.
+- Updated renderer: Index button per document in toolbar, Index All button in sidebar, chunk display in document view.
+- Added status bar (idle/indexing/ready/error states) and document count display.
+- Index metadata persisted per document in index/index-meta.json; index data cleaned up on document delete.
+- 56 new test assertions (143 total, Test 11). ESLint clean.
 
 ### Next Features (in priority order)
 | ID | Feature | Status |
 |----|---------|--------|
-| kb-005 | Document import via file picker | passing |
-| kb-006 | Text indexing with chunking | not_started |
+| kb-006 | Text indexing with chunking | passing |
 | kb-007 | Grounded Q&A with citations | not_started |
 | kb-008 | Cross-session persistence + status bar | not_started |
 
@@ -35,6 +34,24 @@
 - git ownership mismatch prevents commits without GIT_CONFIG_GLOBAL.
 - Electron cannot be launched in headless sandbox.
 - No TypeScript/React/Vite tooling installed yet.
+
+## 2026-05-13
+
+### Current State
+- kb-005 (document import via file picker) implemented and passing.
+- All 87 tests passing. ESLint: 0 errors, 0 warnings.
+- src/ directory structure in place reflecting Electron layer boundaries.
+- AGENTS.md refined with docs hierarchy, layer boundaries, and conventions.
+- Features kb-006–008 (indexing, grounded Q&A, persistence) queued.
+
+### Actions Taken
+- **File migration**: Moved main.js -> src/main/, preload.js -> src/preload/, renderer.js + index.html + styles.css -> src/renderer/. Updated all path references in package.json, test.js, eslint.config.mjs, and main.js. All 75 tests pass, lint clean.
+- **Directory refactor**: Created src/main/, src/preload/, src/renderer/, src/services/, src/shared/ with layer READMEs.
+- **AGENTS.md refinement**: Merged current routing file with AGENTS (1).md conventions. Added docs hierarchy. Added Electron layer boundaries with current/target mapping. Added TypeScript conventions.
+- **feature_list.json**: Added kb-005 through kb-008. kb-005 now passing.
+- **kb-005 implementation**: Added data:import-file IPC handler with native dialog, 10 MB limit, metadata store (documents-meta.json), importFile preload API, Import button in sidebar, importDocument() renderer function, metadata display, Test 10 (12 assertions), CSS styling for metadata bar.
+- **quality-document.md**: Added Services and Shared Types architectural layers. Added Document Import, Document Indexing, Grounded Answers, and Persistence product domains. Added directory structure map.
+- **docs/AGENTS (1).md**: Removed (duplicate; content merged into AGENTS.md).
 
 ## 2026-05-12
 
@@ -58,4 +75,4 @@
 
 ## 2026-05-11
 
-Initial project scaffolding. Four features implemented (kb-001?004). 75 assertions passing.
+Initial project scaffolding. Four features implemented (kb-001–004). 75 assertions passing.
