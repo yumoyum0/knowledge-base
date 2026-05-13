@@ -97,6 +97,7 @@ Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 - Keep changes within the selected feature scope.
 - Do not silently change verification rules during implementation.
 - Prefer durable repo artifacts over chat summaries.
+- Update README.md before commit.
 - See [docs/working-conventions.md](docs/working-conventions.md) for commit format and full rules.
 
 ## Topic Docs
