@@ -22,7 +22,19 @@
 
 ## Active Work
 
-Directory refactor and AGENTS.md refinement completed. Ready to begin TypeScript migration and feature implementation.
+Directory refactor, AGENTS.md refinement, and kb-005 (document import) completed. kb-006 (text indexing) is next in priority order. 
+
+## Changed Files This Session
+
+- `src/main/main.js` ? added data:import-file IPC handler, loadMeta/saveMeta helpers
+- `src/preload/preload.js` ? added importFile method
+- `src/renderer/index.html` ? added Import button
+- `src/renderer/renderer.js` ? added importDocument() function, metadata display
+- `src/renderer/styles.css` ? added .qa-document-meta styling
+- `test.js` ? added Test 10 (12 assertions for kb-005), now 87 total
+- `eslint.config.mjs` ? added importBtn to renderer globals
+- `feature_list.json` ? marked kb-005 passing with evidence
+- Removed `docs/AGENTS (1).md`
 
 ## Changed Files This Session
 

@@ -22,14 +22,14 @@ A quality snapshot for each product domain and architectural layer. Both agents 
 | Tool | B | git works via GIT_CONFIG_GLOBAL; global config locked | 2026-05-12 |
 | Environment | B | .node-version, .nvmrc, engines field; no container config | 2026-05-12 |
 | State | A | All five artifacts present and consistent | 2026-05-12 |
-| Feedback | B | ESLint clean + 75 assertions; no TS type checking yet | 2026-05-12 |
+| Feedback | B | ESLint clean + 87 assertions; no TS type checking yet | 2026-05-13 |
 
 ## Product Domains
 
 | Domain | Grade | Verification | Key Gaps | Last Updated |
 |--------|-------|-------------|----------|-------------|
-| Document Import | -- | Not yet implemented | kb-005: file picker import | 2026-05-13 |
-| Document Management | B | All passing (75 assertions) | Current: create/edit/delete. Target: import + metadata view | 2026-05-13 |
+| Document Import | B | All passing (87 assertions) | kb-005: native dialog, metadata, 10 MB limit | 2026-05-13 |
+| Document Management | A | All passing (87 assertions) | Create/edit/delete + import with metadata | 2026-05-13 |
 | Document Indexing | -- | Not yet implemented | kb-006: paragraph chunking, index status | 2026-05-13 |
 | Q&A Flow | B | All passing | Current: keyword search. Target: grounded Q&A with citations (kb-007) | 2026-05-13 |
 | Grounded Answers | -- | Not yet implemented | kb-007: citations, confidence scores | 2026-05-13 |
@@ -75,6 +75,7 @@ solution/
 
 ### 2026-05-13
 
+- kb-005 completed: Document import via file picker with native dialog, metadata storage, UI integration, 12 new test assertions.
 - Changes: Created src/ directory structure with layer READMEs (main, preload, renderer, services, shared). Refined AGENTS.md merging current routing file with AGENTS (1).md conventions, ARCHITECTURE.md layer boundaries, and PRODUCT.md features. Added four new features to feature_list.json (kb-005 through kb-008: import, indexing, grounded Q&A, persistence). Updated quality-document with new product domains and architectural layers.
 - New domains added: Document Import, Document Indexing, Grounded Answers, Persistence.
 - New layers added: Services, Shared Types.

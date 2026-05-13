@@ -1,7 +1,7 @@
 ﻿/*
  * test.js — Baseline verification suite (no framework, assert()-based)
  *
- * Test Map (9 blocks, 75 assertions):
+ * Test Map (10 blocks, 87 assertions):
  * ┌──────────┬─────────────────────────────┬────────────┬──────────────────────────────┐
  * │ Block    │ What it covers              │ Assertions │ How                           │
  * ├──────────┼─────────────────────────────┼────────────┼──────────────────────────────┤
@@ -25,6 +25,7 @@
  * - Tests 5b-5c: verify specific feature behaviors (Q&A, CRUD)
  * - Test 8: verify core search algorithm with edge cases (match, no-match, short words, truncation)
  * - Test 9: verify CRUD with real filesystem ops including path-traversal guard
+ * - Test 10: verify document import feature (file picker, metadata, size limit)
  *
  * Extension guide:
  * - New feature? Add a new test block (Test 10+) following the existing pattern.
@@ -237,6 +238,22 @@ assert(!fs.existsSync(testFilePath), 'file deleted from disk');
 // Verify path-traversal guard: resolved path outside dataDir is rejected
 const outsidePath = path.join(__dirname, '..', 'outside.md');
 assert(!path.resolve(outsidePath).startsWith(dataDir), 'path outside dataDir is correctly detected');
+
+// --- Test 10: kb-005 document import ---
+console.log('\n--- Test 10: document import (kb-005) ---');
+assert(mainJs.includes("ipcMain.handle('data:import-file'"), 'main.js registers data:import-file handler');
+assert(mainJs.includes('dialog.showOpenDialog'), 'main.js uses dialog.showOpenDialog for file picker');
+assert(mainJs.includes('MAX_FILE_SIZE'), 'main.js enforces max file size limit');
+assert(mainJs.includes('documents-meta.json'), 'main.js writes document metadata');
+assert(mainJs.includes('loadMeta'), 'main.js defines loadMeta helper');
+assert(mainJs.includes('saveMeta'), 'main.js defines saveMeta helper');
+assert(preload.includes('importFile'), 'preload exposes importFile method');
+assert(renderer.includes('function importDocument'), 'renderer.js defines importDocument');
+assert(renderer.includes("importBtn.addEventListener('click', importDocument)"), 'renderer.js wires import-btn click');
+assert(html.includes('id="import-btn"'), 'HTML has import-btn element');
+// Verify metadata fields in list-files handler
+assert(mainJs.includes('importDate'), 'main.js list-files includes importDate from metadata');
+assert(mainJs.includes('meta[e.name]'), 'main.js list-files checks metadata per file');
 
 // --- Summary ---
 console.log(`\n=== Results: ${passed} passed, ${failed} failed ===`);

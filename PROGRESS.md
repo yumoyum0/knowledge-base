@@ -14,13 +14,14 @@
 
 - **Directory refactor**: Created src/main/, src/preload/, src/renderer/, src/services/, src/shared/ with layer READMEs. Working JS files remain at root during migration.
 - **AGENTS.md refinement**: Merged current routing file with AGENTS (1).md conventions. Added docs hierarchy (ARCHITECTURE.md → PRODUCT.md → feature_list.json). Added Electron layer boundaries with current/target mapping. Added TypeScript conventions. Added new IPC channel naming pattern.
-- **feature_list.json**: Added kb-005 (document import via file picker), kb-006 (text indexing with chunking), kb-007 (grounded Q&A with citations), kb-008 (cross-session persistence + status bar). All not_started.
+- **feature_list.json**: Added kb-005 through kb-008. kb-005 now passing.
+- **kb-005 implementation**: Added data:import-file IPC handler with native dialog, 10 MB limit, metadata store (documents-meta.json), importFile preload API, Import button in sidebar, importDocument() renderer function, metadata display, Test 10 (12 assertions), CSS styling for metadata bar.
 - **quality-document.md**: Added Services and Shared Types architectural layers. Added Document Import, Document Indexing, Grounded Answers, and Persistence product domains. Added directory structure map.
 
 ### Next Features (in priority order)
 | ID | Feature | Status |
 |----|---------|--------|
-| kb-005 | Document import via file picker | not_started |
+| kb-005 | Document import via file picker | passing |
 | kb-006 | Text indexing with chunking | not_started |
 | kb-007 | Grounded Q&A with citations | not_started |
 | kb-008 | Cross-session persistence + status bar | not_started |

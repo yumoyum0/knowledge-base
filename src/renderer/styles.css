@@ -379,3 +379,16 @@ html, body {
 #qa-submit:hover {
   opacity: 0.85;
 }
+
+/* --- Document metadata bar --- */
+.qa-document-meta {
+  display: flex;
+  gap: 12px;
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}

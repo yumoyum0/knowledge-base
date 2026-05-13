@@ -1,4 +1,5 @@
 ﻿// --- DOM references ---
+const importBtn = document.getElementById('import-btn');
 const docList = document.getElementById('doc-list');
 const qaThread = document.getElementById('qa-thread');
 const qaForm = document.getElementById('qa-form');
@@ -75,6 +76,16 @@ function renderDocumentView(file, content) {
   toolbar.querySelector('.doc-delete-btn-danger').addEventListener('click', () => deleteDocument(file));
   qaThread.appendChild(toolbar);
 
+    // Metadata
+  if (file.size) {
+    const metaDiv = document.createElement('div');
+    metaDiv.className = 'qa-document-meta';
+    const sizeKB = (file.size / 1024).toFixed(1);
+    const importDate = file.importDate ? new Date(file.importDate).toLocaleDateString() : 'unknown';
+    metaDiv.innerHTML = `<span>Size: ${sizeKB} KB</span> &middot; <span>Imported: ${importDate}</span>`;
+    qaThread.appendChild(metaDiv);
+  }
+
   // Content
   if (content !== null && content.length > 0) {
     const contentDiv = document.createElement('div');
@@ -133,6 +144,23 @@ async function saveEdit(file) {
 function cancelEdit(file, originalContent) {
   editMode = false;
   renderDocumentView(file, originalContent);
+}
+
+// --- Import document via file picker ---
+async function importDocument() {
+  const result = await window.kbAPI.importFile();
+  if (!result) return; // user cancelled
+  if (result.error) {
+    alert(`Import failed: ${result.error}`);
+    return;
+  }
+  await loadDocumentList();
+  // Auto-select the imported file
+  const files = await window.kbAPI.listFiles();
+  const imported = files.find(f => f.name === result.name);
+  if (imported) {
+    await selectDocument(imported);
+  }
 }
 
 // --- Create new document ---
@@ -254,10 +282,14 @@ async function init() {
   dataPathEl.textContent = `Data: ${dataPath}`;
   await loadDocumentList();
 
-  // Wire the New Document button (inside init for guaranteed DOM readiness)
   if (newDocBtn) {
     newDocBtn.addEventListener('click', createNewDocument);
+  }
+  if (importBtn) {
+    importBtn.addEventListener('click', importDocument);
   }
 }
 
 init();
+
+

@@ -1,4 +1,4 @@
-﻿{
+{
   "project": "knowledge-base",
   "last_updated": "2026-05-13",
   "rules": {
@@ -99,15 +99,24 @@
       "area": "documents",
       "title": "Document import via file picker",
       "user_visible_behavior": "User clicks Import button, native file picker opens for .txt/.md files. Selected file is imported: content extracted, metadata recorded, document appears in sidebar list. Maximum 10 MB per file.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Click Import button -- verify file picker opens.",
         "Select a .txt or .md file -- verify it appears in document list.",
         "Verify document metadata displays (title, filename, size, import date).",
         "Verify file > 10 MB is rejected with an error message."
       ],
-      "evidence": [],
-      "notes": "Uses ImportPanel component. IPC channel: documents:import. Requires PersistenceService for content storage."
+      "evidence": [
+        "2026-05-13: data:import-file IPC handler with native file picker (dialog.showOpenDialog).",
+        "2026-05-13: File validation: .txt/.md only, 10 MB max, duplicate detection.",
+        "2026-05-13: Metadata stored in data/documents-meta.json (originalPath, size, importDate, indexed).",
+        "2026-05-13: importFile exposed via preload contextBridge.",
+        "2026-05-13: Import button in sidebar header, importDocument() function in renderer.",
+        "2026-05-13: Metadata display in document view (size in KB, import date).",
+        "2026-05-13: npm test passes with 87 assertions including Test 10 for kb-005.",
+        "2026-05-13: npm run lint clean (0 errors, 0 warnings)."
+      ],
+      "notes": "Uses native Electron dialog. IPC channel: data:import-file. Metadata synced across create/update/delete operations."
     },
     {
       "id": "kb-006",
@@ -120,7 +129,7 @@
         "Import a document and trigger indexing.",
         "Verify chunks are created (~500 chars each, paragraph boundaries respected).",
         "Verify chunk metadata includes character count and word count.",
-        "Verify status bar reflects indexing progress (idle → indexing → ready).",
+        "Verify status bar reflects indexing progress (idle \u2192 indexing \u2192 ready).",
         "Verify full-library indexing processes all documents."
       ],
       "evidence": [],
