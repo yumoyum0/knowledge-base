@@ -97,7 +97,9 @@ Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 
 ## Working Rules
 
-- Work on one feature at a time.
+- Work on one feature at a time
+- Only start the next feature after the current one passes end-to-end verification
+- Don't "also refactor" feature B while implementing feature A
 - Do not mark a feature complete just because code was added.
 - Keep changes within the selected feature scope.
 - Do not silently change verification rules during implementation.
