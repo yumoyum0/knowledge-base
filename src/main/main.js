@@ -1,7 +1,7 @@
 ﻿/*
  * main.js — Electron main process
  *
- * IPC Channel Contract (11 channels):
+ * IPC Channel Contract (13 channels):
  * ┌───────────────────────────┬───────────────────────────────────┬─────────────────────────────┐
  * │ Channel                   │ Signature                         │ Returns                     │
  * ├───────────────────────────┼───────────────────────────────────┼─────────────────────────────┤
@@ -45,6 +45,8 @@ const PersistenceService = require('../services/PersistenceService');
 const IndexingService = require('../services/IndexingService');
 const persistence = new PersistenceService(dataDir);
 const indexingService = new IndexingService(persistence);
+const QaService = require("../services/QaService");
+const qaService = new QaService(persistence, indexingService);
 const META_PATH = path.join(dataDir, 'documents-meta.json');
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
@@ -352,6 +354,20 @@ ipcMain.handle('indexing:get-chunks', async (_event, docName) => {
     return chunks || [];
   } catch { return [];
   }
+});
+
+// IPC: Q&A -- ask a question
+ipcMain.handle("qa:ask", async (_event, question) => {
+  try {
+    return qaService.ask(question);
+  } catch { return { error: "Failed to process question" }; }
+});
+
+// IPC: Q&A -- get history
+ipcMain.handle("qa:get-history", async () => {
+  try {
+    return qaService.getHistory();
+  } catch { return []; }
 });
 
 app.whenReady().then(createWindow);

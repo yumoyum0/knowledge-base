@@ -1,5 +1,27 @@
 ﻿# Knowledge-Base App — Session Progress
 
+## 2026-05-14 (kb-007)
+
+### Current State
+- kb-007 implemented: Grounded Q&A with citations.
+- 171 tests passing (was 145). ESLint: 0 errors, 0 warnings.
+- kb-001 through kb-007 all passing.
+- Feature kb-008 (cross-session persistence + status bar) queued.
+
+### Actions Taken
+- **Unit 1**: Created src/services/QaService.js with keyword-based chunk retrieval, citations, and confidence scoring.
+- **Unit 2**: Extended QaService with history persistence to qa-history.json via atomic writes.
+- **Unit 3**: Added IPC handlers qa:ask and qa:get-history to main.js.
+- **Unit 4**: Extended preload.js with ask() and getHistory() methods.
+- **Unit 5**: Replaced renderer Q&A handler to use kbAPI.ask(), displays citations and confidence badge. Added CSS styles.
+- **Unit 6**: Added Test 12 with 26 assertions (171 total). Lint clean.
+
+### Next Features
+| ID | Feature | Status |
+|----|---------|--------|
+| kb-007 | Grounded Q&A with citations | passing |
+| kb-008 | Cross-session persistence + status bar | not_started |
+
 ## 2026-05-14 (Exercise 4-3: Initialization acceptance checklist)
 
 ### Current State

@@ -292,22 +292,38 @@ qaForm.addEventListener('submit', async (e) => {
   userMsg.innerHTML = '<strong>Q:</strong> ' + escapeHtml(question);
   qaThread.appendChild(userMsg);
 
-  // Generate response
-  let answer;
-  if (currentDoc) {
-    const content = await window.kbAPI.readFile(currentDoc.path);
-    if (content) {
-      answer = searchDocument(question, content);
-    } else {
-      answer = 'Could not read "' + escapeHtml(currentDoc.name) + '".';
-    }
-  } else {
-    answer = 'No document selected. Please select a document from the sidebar first.';
-  }
-
+  // Generate response via QaService
   const responseMsg = document.createElement('div');
   responseMsg.className = 'qa-message qa-response';
-  responseMsg.innerHTML = '<strong>A:</strong> ' + answer;
+
+  try {
+    const result = await window.kbAPI.ask(question);
+
+    // Answer text
+    let html = '<strong>A:</strong> ' + escapeHtml(result.answer).replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
+
+    // Citations
+    if (result.citations && result.citations.length > 0) {
+      html += '<div class="qa-citation-list">';
+      result.citations.forEach(c => {
+        html += '<div class="qa-citation">' +
+          '<span class="qa-citation-doc">' + escapeHtml(c.docName) + ' (chunk ' + (c.chunkIndex + 1) + ')</span>' +
+          '<span class="qa-citation-excerpt">' + escapeHtml(c.excerpt) + '</span>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+
+    // Confidence badge
+    const pct = Math.round(result.confidence * 100);
+    const confClass = result.confidence >= 0.85 ? 'qa-confidence-high' : 'qa-confidence-low';
+    const confLabel = result.confidence >= 0.85 ? 'High confidence' : 'Low confidence';
+    html += '<div class="qa-confidence ' + confClass + '">' + confLabel + ' (' + pct + '%)</div>';
+
+    responseMsg.innerHTML = html;
+  } catch {
+    responseMsg.innerHTML = '<strong>A:</strong> Failed to process question.';
+  }
   qaThread.appendChild(responseMsg);
 
   // Scroll to bottom
@@ -317,6 +333,7 @@ qaForm.addEventListener('submit', async (e) => {
 });
 
 // --- Search document for question keywords ---
+// eslint-disable-next-line no-unused-vars
 function searchDocument(question, content) {
   const questionWords = question.toLowerCase().match(/\b\w+\b/g) || [];
   const lines = content.split('\n');

@@ -346,6 +346,100 @@ assert(mainJs.includes("require('../services/PersistenceService')"), 'main.js re
 assert(mainJs.includes("require('../services/IndexingService')"), 'main.js requires IndexingService');
 assert(mainJs.includes('indexingService.removeDocument'), 'main.js removes index data on delete');
 
+
+// --- Test 12: grounded Q&A with citations (kb-007) ---
+console.log('\n--- Test 12: grounded Q&A with citations (kb-007) ---');
+
+// 12a: QaService exists and can be required
+let QaService;
+try {
+  QaService = require('./src/services/QaService');
+  assert(true, 'QaService.js can be required');
+} catch {
+  assert(false, 'QaService.js can be required');
+}
+
+if (QaService) {
+  const PersistenceService = require('./src/services/PersistenceService');
+  const IndexingService = require('./src/services/IndexingService');
+  const ps = new PersistenceService(dataDir);
+  const is = new IndexingService(ps);
+
+  // Index a test document
+  is.indexDocument('qa-test', 'The sky is blue. The ocean is deep. Knowledge bases organize information.');
+  const qa = new QaService(ps, is);
+
+  // 12b: ask() returns { answer, citations, confidence } shape
+  const r = qa.ask('sky');
+  assert(typeof r.answer === 'string', 'ask() returns answer string');
+  assert(Array.isArray(r.citations), 'ask() returns citations array');
+  assert(typeof r.confidence === 'number', 'ask() returns confidence number');
+
+  // 12c: Citation includes docName, chunkIndex, excerpt
+  if (r.citations.length > 0) {
+    const c = r.citations[0];
+    assert(typeof c.docName === 'string', 'citation has docName field');
+    assert(typeof c.chunkIndex === 'number', 'citation has chunkIndex field');
+    assert(typeof c.excerpt === 'string', 'citation has excerpt field');
+  }
+
+  // 12d: Confidence is 0.85 with citations, 0.30 without
+  const rMatch = qa.ask('knowledge');
+  assert(rMatch.confidence === 0.85, 'confidence is 0.85 when citations found');
+  const rNoMatch = qa.ask('zzzxyz123');
+  assert(rNoMatch.confidence === 0.30, 'confidence is 0.30 when no citations found');
+
+  // 12e: getHistory() returns entries with correct shape
+  const history = qa.getHistory();
+  assert(Array.isArray(history), 'getHistory() returns an array');
+  if (history.length > 0) {
+    const h = history[0];
+    assert(typeof h.question === 'string', 'history entry has question');
+    assert(typeof h.answer === 'string', 'history entry has answer');
+    assert(Array.isArray(h.citations), 'history entry has citations array');
+    assert(typeof h.confidence === 'number', 'history entry has confidence');
+    assert(typeof h.timestamp === 'string', 'history entry has timestamp');
+  }
+
+  // 12f: History persists across reconstruction
+  const qa2 = new QaService(ps, is);
+  const history2 = qa2.getHistory();
+  assert(history2.length === history.length, 'history survives reconstruction');
+
+  // Cleanup test index data
+  is.removeDocument('qa-test');
+
+  // Delete qa-history.json created by tests
+  const historyPath = require('path').join(dataDir, 'qa-history.json');
+  try { if (fs.existsSync(historyPath)) fs.unlinkSync(historyPath); } catch { /* ignore */ }
+}
+
+// 12g: main.js requires QaService
+assert(mainJs.includes('require("../services/QaService")'), 'main.js requires QaService');
+
+// 12h: main.js registers qa:ask handler
+assert(mainJs.includes('ipcMain.handle("qa:ask"'), 'main.js registers qa:ask handler');
+
+// 12i: main.js registers qa:get-history handler
+assert(mainJs.includes('ipcMain.handle("qa:get-history"'), 'main.js registers qa:get-history handler');
+
+// 12j: preload exposes ask method
+assert(preload.includes("'qa:ask'"), 'preload exposes qa:ask channel');
+assert(preload.includes('ask:'), 'preload exposes ask method');
+
+// 12k: preload exposes getHistory method
+assert(preload.includes("'qa:get-history'"), 'preload exposes qa:get-history channel');
+assert(preload.includes('getHistory:'), 'preload exposes getHistory method');
+
+// 12l: renderer calls kbAPI.ask
+assert(renderer.includes('window.kbAPI.ask'), 'renderer calls kbAPI.ask');
+
+// 12m: renderer creates citation DOM elements
+assert(renderer.includes('qa-citation'), 'renderer creates citation DOM elements');
+
+// 12n: renderer creates confidence score element
+assert(renderer.includes('qa-confidence'), 'renderer creates confidence score element');
+
 // --- Summary ---
 console.log('\n=== Results: ' + passed + ' passed, ' + failed + ' failed ===');
 process.exit(failed > 0 ? 1 : 0);

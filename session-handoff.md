@@ -1,14 +1,13 @@
-# Session Handoff ? 2026-05-13
+﻿# Session Handoff — 2026-05-14
 
 ## Quick State
 
 | What | Status |
 |------|--------|
-| Features (kb-001?005) | All passing |
-| Features (kb-006?008) | Not started |
-| `npm test` | 87/87 |
+| Features (kb-001–007) | All passing |
+| Features (kb-008) | Not started |
+| `npm test` | 171/171 |
 | `npm run lint` | 0 errors, 0 warnings |
-| Directory structure | src/ layers created |
 
 ## Harness Scores
 
@@ -22,32 +21,28 @@
 
 ## Active Work
 
-Directory refactor, AGENTS.md refinement, and kb-005 (document import) completed. kb-006 (text indexing) is next in priority order.
+kb-007 (Grounded Q&A with citations) completed in 6 atomic units:
+1. QaService — chunk retrieval + answer generation
+2. QaService — history persistence to qa-history.json
+3. IPC handlers (qa:ask, qa:get-history)
+4. Preload API (ask, getHistory)
+5. Renderer — citation display, confidence badge, CSS
+6. Test 12 — 26 new assertions
 
 ## Changed Files This Session
 
-- `src/main/main.js` ? added data:import-file IPC handler, loadMeta/saveMeta helpers
-- `src/preload/preload.js` ? added importFile method
-- `src/renderer/index.html` ? added Import button
-- `src/renderer/renderer.js` ? added importDocument() function, metadata display
-- `src/renderer/styles.css` ? added .qa-document-meta styling
-- `test.js` ? added Test 10 (12 assertions), now 87 total
-- `eslint.config.mjs` ? added Buffer to Node globals, importBtn to renderer globals
-- `feature_list.json` ? marked kb-005 passing with evidence
-- `PROGRESS.md` ? updated session log
-- `quality-document.md` ? updated grades and change history
-- `docs/AGENTS (1).md` ? removed (duplicate)
-- `src/` ? directory structure created with layer READMEs
-- `AGENTS.md` ? refined with docs hierarchy, layer boundaries, conventions
-
-## New Docs Available
-
-- `docs/ARCHITECTURE.md` ? Electron layers, data flow, import pipeline
-- `docs/PRODUCT.md` ? Feature requirements and UI layout
+- `src/services/QaService.js` — created (Units 1-2)
+- `src/main/main.js` — added QaService init, qa:ask + qa:get-history IPC handlers (Unit 3)
+- `src/preload/preload.js` — added ask() + getHistory() methods (Unit 4)
+- `src/renderer/renderer.js` — replaced Q&A handler with kbAPI.ask(), citation + confidence display (Unit 5)
+- `src/renderer/styles.css` — added citation + confidence styles (Unit 5)
+- `test.js` — added Test 12, 26 assertions, 171 total (Unit 6)
+- `feature_list.json` — kb-007 marked passing with evidence
+- `PROGRESS.md` — session log updated
+- `session-handoff.md` — this file
 
 ## Next Session
 
-1. Run `./init.sh` or `./init.ps1`
-2. Read `docs/ARCHITECTURE.md` and `docs/PRODUCT.md`
-3. Start kb-006: text indexing with paragraph-aware chunking
-4. Begin TypeScript migration of existing JS files into src/ structure
+1. Run `./init.ps1`
+2. Start kb-008: Cross-session persistence + status bar
+3. Begin TypeScript migration of existing JS files into src/ structure
