@@ -1,10 +1,23 @@
 ﻿# Knowledge-Base App — Session Progress
 
+## 2026-05-14 (Exercise 4-3: Initialization acceptance checklist)
+
+### Current State
+- Exercise 4-3 completed: Initialization acceptance checklist designed and executed.
+- All 145 tests passing. ESLint: 0 errors, 0 warnings.
+- clean-state-checklist.md created at repo root.
+- Two stale assertion counts corrected (PROGRESS.md and quality-document.md).
+
+### Actions Taken
+- Ran full initialization acceptance checklist: `npm install`, `npm test` (145/145), `npm run lint` (clean), git status (clean except exercise files).
+- Created clean-state-checklist.md from data/templates/clean-state-checklist.md template with both Harness Engineering model checklist and clean-state items.
+- Corrected PROGRESS.md assertion count (143→145) and quality-document.md assertion counts (87→145 for Feedback, Document Import, Document Management; 143→145 for Document Indexing).
+
 ## 2026-05-13 (kb-006)
 
 ### Current State
 - kb-006 implemented: Text indexing with paragraph-aware chunking.
-- 143 tests passing. ESLint: 0 errors, 0 warnings.
+- 145 tests passing. ESLint: 0 errors, 0 warnings.
 - kb-001 through kb-006 all passing.
 - Feature kb-007 (grounded Q&A with citations) and kb-008 (persistence + status bar) queued.
 
@@ -16,7 +29,7 @@
 - Updated renderer: Index button per document in toolbar, Index All button in sidebar, chunk display in document view.
 - Added status bar (idle/indexing/ready/error states) and document count display.
 - Index metadata persisted per document in index/index-meta.json; index data cleaned up on document delete.
-- 56 new test assertions (143 total, Test 11). ESLint clean.
+- 56 new test assertions (145 total, Test 11). ESLint clean.
 
 ### Next Features (in priority order)
 | ID | Feature | Status |

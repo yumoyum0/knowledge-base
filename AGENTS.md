@@ -82,7 +82,7 @@ Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 | Command | What it checks |
 |---------|---------------|
 | `npm run verify` | Single-command baseline: runs lint then test. Use before starting new work. |
-| `npm test` | 143 assertions across data/, file listing, HTML structure, renderer functions, Q&A, CRUD, preload API, main.js IPC, indexing |
+| `npm test` | 145 assertions across data/, file listing, HTML structure, renderer functions, Q&A, CRUD, preload API, main.js IPC, indexing |
 | `npm run lint` | ESLint on main.js, preload.js, renderer.js, test.js — 0 errors, 0 warnings |
 | `node --version` | Must be Node 24.x |
 | `npm install` | Dependencies up to date |
@@ -104,6 +104,19 @@ Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 - Prefer durable repo artifacts over chat summaries.
 - Update README.md before commit.
 - See [docs/working-conventions.md](docs/working-conventions.md) for commit format and full rules.
+
+## Clean State Checklist
+
+Before declaring the project complete, verify every item in [clean-state-checklist.md](clean-state-checklist.md).
+
+## Session Handoff
+
+When resuming work, read [session-handoff.md](session-handoff.md) for context from the previous session. When finishing a session, update it with:
+
+- What was accomplished
+- What remains
+- Any blockers or decisions made
+- Files that were modified
 
 ## Topic Docs
 

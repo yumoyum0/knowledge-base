@@ -22,15 +22,15 @@ A quality snapshot for each product domain and architectural layer. Both agents 
 | Tool | B | git works via GIT_CONFIG_GLOBAL; global config locked | 2026-05-12 |
 | Environment | B | .node-version, .nvmrc, engines field; no container config | 2026-05-12 |
 | State | A | All five artifacts present and consistent | 2026-05-12 |
-| Feedback | B | ESLint clean + 87 assertions; no TS type checking yet | 2026-05-13 |
+| Feedback | B | ESLint clean + 145 assertions; no TS type checking yet | 2026-05-13 |
 
 ## Product Domains
 
 | Domain | Grade | Verification | Key Gaps | Last Updated |
 |--------|-------|-------------|----------|-------------|
-| Document Import | B | All passing (87 assertions) | kb-005: native dialog, metadata, 10 MB limit | 2026-05-13 |
-| Document Management | A | All passing (87 assertions) | Create/edit/delete + import with metadata | 2026-05-13 |
-| Document Indexing | B | All passing (143 assertions) | kb-006: paragraph chunking, ~500 chars, chunk metadata, index status, status bar | 2026-05-13 |
+| Document Import | B | All passing (145 assertions) | kb-005: native dialog, metadata, 10 MB limit | 2026-05-13 |
+| Document Management | A | All passing (145 assertions) | Create/edit/delete + import with metadata | 2026-05-13 |
+| Document Indexing | B | All passing (145 assertions) | kb-006: paragraph chunking, ~500 chars, chunk metadata, index status, status bar | 2026-05-13 |
 | Q&A Flow | B | All passing | Current: keyword search. Target: grounded Q&A with citations (kb-007) | 2026-05-13 |
 | Grounded Answers | -- | Not yet implemented | kb-007: citations, confidence scores | 2026-05-13 |
 | Persistence | -- | Not yet implemented | kb-008: structured data store, status bar | 2026-05-13 |
@@ -73,6 +73,13 @@ solution/
 
 ## Change History
 
+### 2026-05-14
+
+- Exercise 4-3: Initialization acceptance checklist designed and executed. All checklist items pass.
+- Changes: clean-state-checklist.md created. Assertion counts corrected (87→145) after kb-006 addition.
+- Gaps identified: PROGRESS.md and quality-document.md had stale assertion counts — now corrected.
+
+
 ### 2026-05-13
 
 - kb-005 completed: Document import via file picker with native dialog, metadata storage, UI integration, 12 new test assertions.
@@ -85,4 +92,5 @@ solution/
 
 - Changes: Completed harness audit (five-tuple, cold-start, knowledge externalization, ACID, SNR, progressive disclosure, lost-in-the-middle). Added ESLint, Node version pinning, session-handoff.md, README.md, Recovery section. Renamed claude-progress.md to PROGRESS.md. Created docs/ topic documents.
 - Domains promoted: Instruction (C→A), Tool (C→B), Environment (C→B), Feedback (C→B), State (B→A).
+
 
