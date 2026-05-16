@@ -1,6 +1,6 @@
 {
     "project": "knowledge-base",
-    "last_updated": "2026-05-14",
+    "last_updated": "2026-05-16",
     "rules": {
         "single_active_feature": true,
         "passing_requires_evidence": true,
@@ -182,7 +182,7 @@
             "area": "persistence",
             "title": "Cross-session persistence and status bar",
             "user_visible_behavior": "All imported documents, index data, and Q&A history persist across application restarts. Document list loads automatically on startup. Status bar shows real-time index status, document count, and last activity timestamp. Data stored in knowledge-base-data/ in the user's application data directory.",
-            "status": "not_started",
+            "status": "passing",
             "verification": [
                 "Import and index several documents.",
                 "Close and reopen the app -- verify all documents are listed.",
@@ -190,7 +190,14 @@
                 "Verify Q&A history is preserved.",
                 "Verify status bar shows correct document count and index status."
             ],
-            "evidence": [],
+            "evidence": [
+                "2026-05-16: All 3/3 verification checks passed.",
+                "2026-05-16: lint — PASS",
+                "2026-05-16: check-arch — PASS",
+                "2026-05-16: test — PASS",
+                "2026-05-16: Test block for kb-008 found in test.js.",
+                "2026-05-16: 200 assertions passing in test suite."
+            ],
             "notes": "PersistenceService handles all I/O. Data stored in structured directory: documents-meta.json, content/<id>.txt, chunks/<id>.json, index/index-meta.json, qa-history.json.",
             "files": [
                 "src/main/main.js (app data dir migration)",

@@ -1,7 +1,8 @@
 ﻿/*
  * PersistenceService.js — Low-level JSON/text file I/O
  *
- * Handles reading and writing of index metadata and chunk files.
+ * Handles reading and writing of document content, index metadata,
+ * chunk files, and Q&A history.
  * All writes are atomic (write to temp, then rename).
  */
 
@@ -11,18 +12,66 @@ const path = require('path');
 class PersistenceService {
   constructor(dataDir) {
     this.dataDir = dataDir;
+    this.contentDir = path.join(dataDir, 'content');
     this.chunksDir = path.join(dataDir, 'chunks');
     this.indexDir = path.join(dataDir, 'index');
+    this.qaHistoryPath = path.join(dataDir, 'qa-history.json');
     this._ensureDirs();
   }
 
   _ensureDirs() {
+    if (!fs.existsSync(this.contentDir)) {
+      fs.mkdirSync(this.contentDir, { recursive: true });
+    }
     if (!fs.existsSync(this.chunksDir)) {
       fs.mkdirSync(this.chunksDir, { recursive: true });
     }
     if (!fs.existsSync(this.indexDir)) {
       fs.mkdirSync(this.indexDir, { recursive: true });
     }
+  }
+
+  // --- Document content I/O ---
+
+  readContent(docName) {
+    const contentPath = path.join(this.contentDir, docName);
+    try {
+      if (fs.existsSync(contentPath)) {
+        return fs.readFileSync(contentPath, 'utf-8');
+      }
+    } catch { /* corrupt or missing */ }
+    return null;
+  }
+
+  writeContent(docName, content) {
+    const contentPath = path.join(this.contentDir, docName);
+    const tmpPath = contentPath + '.tmp';
+    fs.writeFileSync(tmpPath, content, 'utf-8');
+    fs.renameSync(tmpPath, contentPath);
+  }
+
+  deleteContent(docName) {
+    const contentPath = path.join(this.contentDir, docName);
+    if (fs.existsSync(contentPath)) {
+      fs.unlinkSync(contentPath);
+    }
+  }
+
+  // --- QA history I/O ---
+
+  readQaHistory() {
+    try {
+      if (fs.existsSync(this.qaHistoryPath)) {
+        return JSON.parse(fs.readFileSync(this.qaHistoryPath, 'utf-8'));
+      }
+    } catch { /* corrupt or empty */ }
+    return [];
+  }
+
+  writeQaHistory(history) {
+    const tmpPath = this.qaHistoryPath + '.tmp';
+    fs.writeFileSync(tmpPath, JSON.stringify(history, null, 2), 'utf-8');
+    fs.renameSync(tmpPath, this.qaHistoryPath);
   }
 
   // --- Chunk I/O ---

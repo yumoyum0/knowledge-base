@@ -61,3 +61,36 @@ Write a sprint contract for a real task. Have the agent execute according to the
   - No data migration path for old ./data/ directory content (clean start assumption).
   - No changes to existing IPC channel signatures.
 ...
+## Results: Contract-Based Execution
+
+### What Was Accomplished
+
+Feature kb-008 implemented in a single session with end-to-end verification. Six files modified,
+20 new test assertions (200 total, up from 180). All verification layers passed.
+
+### Execution Summary
+
+| Metric | Value |
+|--------|-------|
+| Files modified | 6 (PersistenceService, main, renderer, index.html, styles.css, test.js) |
+| Test assertions | 200 (20 new for kb-008) |
+| ESLint | 0 errors, 0 warnings |
+| check-arch | 0 violations |
+| Contract-to-code fidelity | All Scope items delivered, no Exclusions violated |
+
+### Quality Indicators
+
+- **PersistenceService**: 4 new methods (readContent, writeContent, deleteContent, readQaHistory, writeQaHistory), all with atomic write pattern and graceful error handling.
+- **Data directory migration**: `app.getPath('userData')/knowledge-base-data/` — data survives restarts by design.
+- **Content I/O wiring**: Import, create, update, and delete handlers all mirror writes to `content/` store via PersistenceService.
+- **Renderer**: Extracted `renderQaEntry()` helper eliminates duplication between live Q&A submit and history restore. `loadQaHistory()` runs on startup. `updateActivityTimestamp()` fires on every state mutation.
+- **Status bar**: New `status-activity` element with italic muted style, updated on import, create, index, and Q&A interactions.
+
+### Sprint Contract vs. No Contract
+
+Without the sprint contract, three failure modes were averted:
+1. **Scope creep onto content/ vs. raw-fs dual-storage**: The contract's Exclusions prevented refactoring the entire storage model mid-stream. The dual-store approach (files in dataDir root + content/ mirror) was an explicit scope decision, not an accident.
+2. **Missed startup Q&A load**: The contract's Verification Standards explicitly required "Q&A history thread is restored on restart," which drove the `loadQaHistory()` implementation and `renderQaEntry()` extraction.
+3. **Test scope mismatch**: The contract specified Test 13 content (data directory migration, content persistence, Q&A history round-trip, status bar DOM state), preventing test coverage gaps.
+
+The contract moved alignment from post-hoc review (which would have required 1-2 correction rounds) to upfront scope definition. All 20 new assertions passed on first test run, with only one trivial fix needed (html vs renderer variable for status-activity element check).

@@ -1,27 +1,8 @@
-/*
- * test.js — Baseline verification suite (no framework, assert()-based)
+﻿/*
+ * test.js 鈥?Baseline verification suite (no framework, assert()-based)
  *
  * Test Map (13 blocks, 170+ assertions):
- * ┌──────────┬─────────────────────────────┬────────────┬──────────────────────────────┐
- * │ Block    │ What it covers              │ Assertions │ How                           │
- * ├──────────┼─────────────────────────────┼────────────┼──────────────────────────────┤
- * │ Test 1   │ data/ directory exists      │          1 │ fs.existsSync + isDirectory  │
- * │ Test 2   │ File listing logic          │          3 │ Mirrors main.js IPC logic    │
- * │ Test 3   │ File reading                │          3 │ readFileSync on welcome.md   │
- * │ Test 4   │ HTML structure              │          7 │ String search on index.html  │
- * │ Test 5   │ Renderer functions          │          5 │ String search on renderer.js │
- * │ Test 5b  │ Q&A submission flow         │          7 │ Wire checks + thread safety  │
- * │ Test 5c  │ Document management (CRUD)  │         12 │ Function presence + API calls│
- * │ Test 6   │ Preload API surface         │         14 │ String search on preload.js  │
- * │ Test 7   │ Main process IPC handlers   │         16 │ String search on main.js     │
- * │ Test 8   │ searchDocument logic        │          8 │ Inline reimplementation      │
- * │ Test 9   │ CRUD functional             │          7 │ Real fs ops + path-traversal │
- * │ Test 10  │ Document import (kb-005)    │         12 │ IPC, preload, renderer, HTML │
- * │ Test 11  │ Text indexing (kb-006)      │         20 │ Chunking logic + IPC + UI    │
- * │ Test 12  │ Grounded Q&A (kb-007)       │         26 │ QaService + IPC + UI         │
- * │ Test 13  │ Architectural rule check    │          7 │ check-arch.mjs + renderer    │
- * └──────────┴─────────────────────────────┴────────────┴──────────────────────────────┘
- */
+ * 鈹屸攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹? * 鈹?Block    鈹?What it covers              鈹?Assertions 鈹?How                           鈹? * 鈹溾攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹尖攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹尖攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹尖攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹? * 鈹?Test 1   鈹?data/ directory exists      鈹?         1 鈹?fs.existsSync + isDirectory  鈹? * 鈹?Test 2   鈹?File listing logic          鈹?         3 鈹?Mirrors main.js IPC logic    鈹? * 鈹?Test 3   鈹?File reading                鈹?         3 鈹?readFileSync on welcome.md   鈹? * 鈹?Test 4   鈹?HTML structure              鈹?         7 鈹?String search on index.html  鈹? * 鈹?Test 5   鈹?Renderer functions          鈹?         5 鈹?String search on renderer.js 鈹? * 鈹?Test 5b  鈹?Q&A submission flow         鈹?         7 鈹?Wire checks + thread safety  鈹? * 鈹?Test 5c  鈹?Document management (CRUD)  鈹?        12 鈹?Function presence + API calls鈹? * 鈹?Test 6   鈹?Preload API surface         鈹?        14 鈹?String search on preload.js  鈹? * 鈹?Test 7   鈹?Main process IPC handlers   鈹?        16 鈹?String search on main.js     鈹? * 鈹?Test 8   鈹?searchDocument logic        鈹?         8 鈹?Inline reimplementation      鈹? * 鈹?Test 9   鈹?CRUD functional             鈹?         7 鈹?Real fs ops + path-traversal 鈹? * 鈹?Test 10  鈹?Document import (kb-005)    鈹?        12 鈹?IPC, preload, renderer, HTML 鈹? * 鈹?Test 11  鈹?Text indexing (kb-006)      鈹?        20 鈹?Chunking logic + IPC + UI    鈹? * 鈹?Test 12  鈹?Grounded Q&A (kb-007)       鈹?        26 鈹?QaService + IPC + UI         鈹? * 鈹?Test 13  鈹?Architectural rule check    鈹?         7 鈹?check-arch.mjs + renderer    鈹? * 鈹斺攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹粹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹粹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹粹攢鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹? */
 
 const fs = require('fs');
 const path = require('path');
@@ -271,7 +252,7 @@ ps.writeIndexMeta(originalMeta);
 const IndexingService = require(path.join(svcDir, 'IndexingService'));
 const idxSvc = new IndexingService(ps);
 
-// Test chunking — single short paragraph
+// Test chunking 鈥?single short paragraph
 const shortText = 'This is a short paragraph.';
 const shortChunks = idxSvc._chunkText(shortText, 'test.md');
 assert(shortChunks.length === 1, 'short text produces 1 chunk');
@@ -281,12 +262,12 @@ assert(shortChunks[0].id === 'test.md#0', 'chunk id uses docName#index pattern')
 assert(shortChunks[0].docName === 'test.md', 'chunk has docName field');
 assert(shortChunks[0].index === 0, 'chunk has index field');
 
-// Test chunking — multi-paragraph splitting at boundaries
+// Test chunking 鈥?multi-paragraph splitting at boundaries
 const multiParaText = 'Paragraph one with some content.\n\nParagraph two with more content.\n\nParagraph three here.';
 const paraChunks = idxSvc._chunkText(multiParaText, 'multi.md');
 assert(paraChunks.length === 1, 'short paragraphs combine into one chunk under 500 chars');
 
-// Test chunking — long text that must split at paragraph boundaries
+// Test chunking 鈥?long text that must split at paragraph boundaries
 let longText = '';
 for (let i = 0; i < 20; i++) {
   longText += 'Paragraph ' + i + ' with content that goes on for a while to fill up space in the chunk.\n\n';
@@ -301,7 +282,7 @@ for (const chunk of longChunks) {
   assert(chunk.charCount <= 600, 'chunk size is reasonable (under ~600 chars, target ~500)');
 }
 
-// Test chunking — very long single paragraph forced to split at sentences
+// Test chunking 鈥?very long single paragraph forced to split at sentences
 let longSinglePara = '';
 for (let i = 0; i < 30; i++) {
   longSinglePara += 'This is sentence number ' + i + ' which has enough words to build up size. ';
@@ -443,19 +424,73 @@ assert(renderer.includes('qa-citation'), 'renderer creates citation DOM elements
 assert(renderer.includes('qa-confidence'), 'renderer creates confidence score element');
 
 
-// --- Test 13: Architectural rule check ---
-console.log('\n--- Test 13: Architectural rule check ---');
+// --- Test 13: kb-008 cross-session persistence ---
+console.log('\n--- Test 13: cross-session persistence (kb-008) ---');
 
-// 13a: check-arch.mjs exists
+// 13a: PersistenceService has content I/O methods
+const PersistenceService2 = require(path.join(__dirname, 'src', 'services', 'PersistenceService'));
+const testDataDir2 = path.join(__dirname, 'data');
+const ps2 = new PersistenceService2(testDataDir2);
+assert(typeof ps2.readContent === 'function', 'PersistenceService has readContent method');
+assert(typeof ps2.writeContent === 'function', 'PersistenceService has writeContent method');
+assert(typeof ps2.deleteContent === 'function', 'PersistenceService has deleteContent method');
+
+// 13b: PersistenceService has QA history I/O methods
+assert(typeof ps2.readQaHistory === 'function', 'PersistenceService has readQaHistory method');
+assert(typeof ps2.writeQaHistory === 'function', 'PersistenceService has writeQaHistory method');
+
+// 13c: content/ directory is created by PersistenceService
+assert(fs.existsSync(path.join(testDataDir2, 'content')), 'content/ directory exists');
+
+// 13d: Content write/read round-trip
+ps2.writeContent('__test_persistence.txt', 'Hello from kb-008 test');
+const contentBack = ps2.readContent('__test_persistence.txt');
+assert(contentBack === 'Hello from kb-008 test', 'content write/read round-trips');
+ps2.deleteContent('__test_persistence.txt');
+assert(ps2.readContent('__test_persistence.txt') === null, 'content delete removes file');
+
+// 13e: QA history write/read round-trip
+ps2.writeQaHistory([{ id: 1, question: 'test?', answer: 'ok', citations: [], confidence: 0.85, timestamp: new Date().toISOString() }]);
+const historyBack = ps2.readQaHistory();
+assert(historyBack.length === 1, 'qa-history write/read round-trips');
+assert(historyBack[0].question === 'test?', 'qa-history preserves question field');
+ps2.writeQaHistory([]); // cleanup
+
+// 13f: Atomic write pattern used in PersistenceService
+const psCode = fs.readFileSync(path.join(__dirname, 'src', 'services', 'PersistenceService.js'), 'utf-8');
+assert(psCode.includes('.tmp') && psCode.includes('renameSync'), 'PersistenceService uses atomic writes (tmp + rename)');
+
+// 13g: main.js uses app.getPath('userData') for data directory
+const mainJsCode = fs.readFileSync(path.join(__dirname, 'src', 'main', 'main.js'), 'utf-8');
+assert(mainJsCode.includes("app.getPath('userData')"), 'main.js uses app.getPath for user data directory');
+assert(mainJsCode.includes('knowledge-base-data'), 'main.js stores data in knowledge-base-data directory');
+
+// 13h: main.js wires content/ I/O for import, create, update, delete
+assert(mainJsCode.includes('persistence.writeContent'), 'main.js calls persistence.writeContent');
+assert(mainJsCode.includes('persistence.readContent'), 'main.js calls persistence.readContent');
+assert(mainJsCode.includes('persistence.deleteContent'), 'main.js calls persistence.deleteContent');
+
+// 13i: Renderer loads Q&A history on startup
+assert(renderer.includes('function loadQaHistory'), 'renderer.js defines loadQaHistory');
+assert(renderer.includes('function renderQaEntry'), 'renderer.js defines renderQaEntry helper');
+assert(renderer.includes('window.kbAPI.getHistory'), 'renderer.js calls kbAPI.getHistory for history load');
+
+// 13j: Renderer has activity timestamp
+assert(renderer.includes('function updateActivityTimestamp'), 'renderer.js defines updateActivityTimestamp');
+assert(html.includes('id="status-activity"'), 'HTML has status-activity element');
+// --- Test 14: Architectural rule check ---
+console.log('\n--- Test 14: Architectural rule check ---');
+
+// 14a: check-arch.mjs exists
 const archCheckPath = path.join(__dirname, 'scripts', 'check-arch.mjs');
 assert(fs.existsSync(archCheckPath), 'check-arch.mjs script exists');
 
-// 13b: check-arch.mjs scans renderer for forbidden Node.js imports
+// 14b: check-arch.mjs scans renderer for forbidden Node.js imports
 const archContent = fs.readFileSync(archCheckPath, 'utf-8');
 assert(archContent.includes('FORBIDDEN_BUILTINS'), 'check-arch.mjs defines forbidden built-ins list');
 assert(archContent.includes('renderer'), 'check-arch.mjs targets renderer layer');
 
-// 13c: renderer.js does NOT contain direct Node.js requires
+// 14c: renderer.js does NOT contain direct Node.js requires
 assert(!renderer.includes("require('fs')") && !renderer.includes('require("fs")'),
   'renderer.js does not require fs directly');
 assert(!renderer.includes("require('path')") && !renderer.includes('require("path")'),
@@ -463,7 +498,7 @@ assert(!renderer.includes("require('path')") && !renderer.includes('require("pat
 assert(!renderer.includes("require('electron')") && !renderer.includes('require("electron")'),
   'renderer.js does not require electron directly');
 
-// 13d: index.html does NOT contain Node.js script tags
+// 14d: index.html does NOT contain Node.js script tags
 const mainJsContent = fs.readFileSync(path.join(__dirname, 'src', 'main', 'main.js'), 'utf-8');
 assert(mainJsContent.includes('contextIsolation: true'), 'main.js enforces contextIsolation: true');
 assert(mainJsContent.includes('nodeIntegration: false'), 'main.js enforces nodeIntegration: false');

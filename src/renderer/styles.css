@@ -508,6 +508,11 @@ body {
 .status-error {
   color: #f38ba8;
 }
+
+.status-activity {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
 /* --- Q&A Citations --- */
 .qa-citation-list {
   margin-top: 10px;

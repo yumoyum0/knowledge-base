@@ -25,17 +25,18 @@
  * - contextIsolation: true, nodeIntegration: false (never relax)
  *
  * Window: 1100x700, min 800x500, title "Knowledge Base"
- * Data: ./data/ (created on first launch if missing)
- * Metadata: data/documents-meta.json
- * Chunks: data/chunks/<doc>.json, Index meta: data/index/index-meta.json
+ * Data: knowledge-base-data/ in user's application data directory (survives restarts)
+ * Metadata: documents-meta.json
+ * Content: content/<name> via PersistenceService (atomic writes)
+ * Chunks: chunks/<doc>.json, Index meta: index/index-meta.json
  */
 
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
-// Ensure data directory exists
-const dataDir = path.join(__dirname, '..', '..', 'data');
+// Data stored in user's application data directory for cross-session persistence
+const dataDir = path.join(app.getPath('userData'), 'knowledge-base-data');
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
@@ -96,7 +97,7 @@ ipcMain.handle('data:list-files', async () => {
         return {
           name: e.name,
           path: filePath,
-          size: stat.size,
+          size: meta[e.name] ? meta[e.name].size : stat.size,
           importDate: meta[e.name] ? meta[e.name].importDate : stat.birthtime.toISOString(),
           indexed: meta[e.name] ? meta[e.name].indexed || false : false
         };
@@ -106,9 +107,13 @@ ipcMain.handle('data:list-files', async () => {
   }
 });
 
-// IPC: read a file's content
+// IPC: read a file's content — prefer content/ store, fall back to raw file
 ipcMain.handle('data:read-file', async (_event, filePath) => {
   try {
+    const name = path.basename(filePath);
+    const content = persistence.readContent(name);
+    if (content !== null) return content;
+    // Fallback: read from file on disk
     return fs.readFileSync(filePath, 'utf-8');
   } catch {
     return null;
@@ -154,7 +159,11 @@ ipcMain.handle('data:import-file', async () => {
       return { error: '"' + safeName + '" already exists in the library.' };
     }
 
+    const content = fs.readFileSync(sourcePath, 'utf-8');
     fs.copyFileSync(sourcePath, destPath);
+
+    // Persist content to content/ store for structured cross-session survival
+    persistence.writeContent(safeName, content);
 
     // Record metadata
     const meta = loadMeta();
@@ -174,7 +183,7 @@ ipcMain.handle('data:import-file', async () => {
       importDate: importDate,
       indexed: false
     };
-  } catch { return { error: 'Failed to read index status' };
+  } catch { return { error: 'Import failed' };
   }
 });
 
@@ -189,13 +198,17 @@ ipcMain.handle('data:create-file', async (_event, name, content) => {
     if (fs.existsSync(filePath)) {
       return { error: 'File already exists' };
     }
-    fs.writeFileSync(filePath, content || '', 'utf-8');
+    const fileContent = content || '';
+    fs.writeFileSync(filePath, fileContent, 'utf-8');
+
+    // Persist to content/ store
+    persistence.writeContent(safeName, fileContent);
 
     // Record metadata for new file
     const meta = loadMeta();
     if (!meta[safeName]) {
       meta[safeName] = {
-        size: Buffer.byteLength(content || '', 'utf-8'),
+        size: Buffer.byteLength(fileContent, 'utf-8'),
         importDate: new Date().toISOString(),
         indexed: false
       };
@@ -203,7 +216,7 @@ ipcMain.handle('data:create-file', async (_event, name, content) => {
     }
 
     return { name: safeName, path: filePath };
-  } catch { return { error: 'Failed to read index status' };
+  } catch { return { error: 'Create failed' };
   }
 });
 
@@ -219,16 +232,19 @@ ipcMain.handle('data:update-file', async (_event, filePath, content) => {
     }
     fs.writeFileSync(resolved, content, 'utf-8');
 
+    // Update content/ store
+    const name = path.basename(resolved);
+    persistence.writeContent(name, content);
+
     // Update metadata size
     const meta = loadMeta();
-    const name = path.basename(resolved);
     if (meta[name]) {
       meta[name].size = Buffer.byteLength(content, 'utf-8');
       saveMeta(meta);
     }
 
     return { success: true };
-  } catch { return { error: 'Failed to read index status' };
+  } catch { return { error: 'Update failed' };
   }
 });
 
@@ -244,9 +260,12 @@ ipcMain.handle('data:delete-file', async (_event, filePath) => {
     }
     fs.unlinkSync(resolved);
 
+    // Remove content/ store entry
+    const name = path.basename(resolved);
+    persistence.deleteContent(name);
+
     // Remove metadata
     const meta = loadMeta();
-    const name = path.basename(resolved);
     if (meta[name]) {
       delete meta[name];
       saveMeta(meta);
@@ -256,7 +275,7 @@ ipcMain.handle('data:delete-file', async (_event, filePath) => {
     indexingService.removeDocument(name);
 
     return { success: true };
-  } catch { return { error: 'Failed to read index status' };
+  } catch { return { error: 'Delete failed' };
   }
 });
 
@@ -279,7 +298,11 @@ ipcMain.handle('indexing:start-single', async (_event, filePath, docName) => {
     indexMeta.documents[docName] = { status: 'indexing', chunkCount: 0, lastIndexed: null };
     persistence.writeIndexMeta(indexMeta);
 
-    const content = fs.readFileSync(resolved, 'utf-8');
+    // Prefer content/ store, fall back to file read
+    let content = persistence.readContent(docName);
+    if (content === null) {
+      content = fs.readFileSync(resolved, 'utf-8');
+    }
     const chunks = indexingService.indexDocument(docName, content);
 
     // Update document metadata
@@ -318,7 +341,10 @@ ipcMain.handle('indexing:start-all', async () => {
     for (const doc of docs) {
       try {
         const filePath = path.join(dataDir, doc.name);
-        const content = fs.readFileSync(filePath, 'utf-8');
+        let content = persistence.readContent(doc.name);
+        if (content === null) {
+          content = fs.readFileSync(filePath, 'utf-8');
+        }
         const chunks = indexingService.indexDocument(doc.name, content);
 
         const meta = loadMeta();
@@ -335,7 +361,7 @@ ipcMain.handle('indexing:start-all', async () => {
 
     indexMeta = persistence.readIndexMeta();
     return { success: true, results: results, status: indexMeta };
-  } catch { return { error: 'Failed to read index status' };
+  } catch { return { error: 'Index all failed' };
   }
 });
 
@@ -381,5 +407,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-

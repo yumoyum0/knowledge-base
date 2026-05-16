@@ -1,66 +1,29 @@
-# Session Handoff — 2026-05-16
+﻿# Session Handoff — 2026-05-16
 
-## Quick State
+## Accomplished
+- kb-008 (Cross-session persistence + status bar) implemented and passing.
+- 200 assertions, 0 failures. ESLint clean. check-arch clean.
+- Data directory migrated to app.getPath('userData')/knowledge-base-data/ for cross-restart survival.
+- PersistenceService extended with content/ I/O and qa-history I/O (atomic write pattern).
+- Renderer loads Q&A history on startup; status bar shows last-activity timestamp.
+- Sprint contract from exercises/Sprint Contract Practice.md executed.
 
-| What | Status |
-|------|--------|
-| Features (kb-001–007) | All passing |
-| Features (kb-008) | Not started |
-| `npm test` | 179/179 |
-| `npm run lint` | 0 errors, 0 warnings |
+## Remaining
+- All features kb-001 through kb-008 are passing.
+- No more features in feature_list.json — project feature work is complete.
+- TypeScript/React/Vite migration is a future target (not started).
 
-## Harness Scores
+## Blockers / Decisions
+- Electron cannot be launched in headless sandbox (known limitation).
+- No data migration path for old ./data/ directory (per sprint contract exclusions).
+- Dual-store approach: files in dataDir root + content/ mirror via PersistenceService.
 
-| Subsystem | Score |
-|-----------|-------|
-| Instruction | 5/5 |
-| Tool | 4/5 |
-| Environment | 3/5 |
-| State | 5/5 |
-| Feedback | 5/5 |
-
-
-## Exercise: Architectural Rule Automation (completed 2026-05-16)
-
-- Selected "Renderer must never import/require Node.js built-in modules" as the constraint to automate
-- Created `scripts/check-arch.mjs` — scans renderer files for forbidden Node.js imports
-- Agent-oriented error messages follow WHAT/WHY/HOW format per Harness Engineering doc
-- Integrated into `npm run verify` pipeline: lint → check-arch → test
-- Added Test 13 (8 assertions) validating the architectural check
-- Full verification: 179/179 assertions, lint 0/0, check-arch clean
-
-### Changed files this session
-- `scripts/check-arch.mjs` — new: architectural rule checker
-- `package.json` — added `check-arch` script; updated `verify` pipeline
-- `AGENTS.md` — added check-arch to verification commands table
-- `test.js` — added Test 13 (8 assertions, 179 total)
-- `exercises/Architectural Rule Automation.md` — filled in plan, constraint, integration, verification
-- `session-handoff.md` — this file
-
-## Active Work
-
-kb-007 (Grounded Q&A with citations) completed in 6 atomic units:
-1. QaService — chunk retrieval + answer generation
-2. QaService — history persistence to qa-history.json
-3. IPC handlers (qa:ask, qa:get-history)
-4. Preload API (ask, getHistory)
-5. Renderer — citation display, confidence badge, CSS
-6. Test 12 — 26 new assertions
-
-## Changed Files This Session
-
-- `src/services/QaService.js` — created (Units 1-2)
-- `src/main/main.js` — added QaService init, qa:ask + qa:get-history IPC handlers (Unit 3)
-- `src/preload/preload.js` — added ask() + getHistory() methods (Unit 4)
-- `src/renderer/renderer.js` — replaced Q&A handler with kbAPI.ask(), citation + confidence display (Unit 5)
-- `src/renderer/styles.css` — added citation + confidence styles (Unit 5)
-- `test.js` — added Test 12, 26 assertions, 171 total (Unit 6)
-- `feature_list.json` — kb-007 marked passing with evidence
-- `PROGRESS.md` — session log updated
-- `session-handoff.md` — this file
-
-## Next Session
-
-1. Run `./init.ps1`
-2. Start kb-008: Cross-session persistence + status bar
-3. Begin TypeScript migration of existing JS files into src/ structure
+## Files Modified
+- src/services/PersistenceService.js
+- src/main/main.js
+- src/renderer/renderer.js
+- src/renderer/index.html
+- src/renderer/styles.css
+- test.js
+- exercises/Sprint Contract Practice.md
+- PROGRESS.md

@@ -1,4 +1,4 @@
-{
+﻿{
     "name":  "knowledge-base",
     "version":  "0.1.0",
     "description":  "Minimal Electron knowledge-base app",
@@ -8,7 +8,8 @@
                     "test":  "node test.js",
                     "lint":  "eslint src/main/main.js src/preload/preload.js src/renderer/renderer.js test.js",
                     "check-arch":  "node scripts/check-arch.mjs",
-                    "verify":  "npm run lint && npm run check-arch && npm test"
+                    "verify":  "npm run lint && npm run check-arch && npm test && npm run verify-feature",
+                    "verify-feature":  "node scripts/verify-feature.mjs"
                 },
     "devDependencies":  {
                             "@eslint/js":  "^10.0.1",
@@ -16,6 +17,6 @@
                             "eslint":  "^10.3.0"
                         },
     "engines":  {
-                    "node":  ">=24.0.0"
+                    "node":  "\u003e=24.0.0"
                 }
 }

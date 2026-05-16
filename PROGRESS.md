@@ -1,4 +1,31 @@
-﻿# Knowledge-Base App — Session Progress
+﻿
+## 2026-05-16 (kb-008)
+
+### Current State
+- kb-008 implemented: Cross-session persistence and status bar.
+- 200 tests passing (was 180). ESLint: 0 errors, 0 warnings. check-arch: 0 violations.
+- kb-001 through kb-008 all passing.
+- Implemented using sprint contract from exercises/Sprint Contract Practice.md.
+
+### Actions Taken
+- Extended PersistenceService with content/ I/O (readContent, writeContent, deleteContent) and qa-history I/O (readQaHistory, writeQaHistory). All atomic writes.
+- Migrated dataDir from project-relative ./data/ to app.getPath('userData')/knowledge-base-data/ for cross-session persistence.
+- Wired content/ I/O in main.js import, create, update, and delete handlers.
+- Added loadQaHistory() to renderer startup for history restoration across restarts.
+- Extracted renderQaEntry() helper to eliminate duplication between live Q&A and history restore.
+- Added updateActivityTimestamp() and status-activity element in HTML/CSS.
+- Added Test 13 with 20 assertions (200 total). Renamed old Test 13 (architectural) to Test 14.
+
+### Files Modified
+- src/services/PersistenceService.js (add content + qa-history I/O)
+- src/main/main.js (dataDir migration + content/ wiring)
+- src/renderer/renderer.js (Q&A history load + activity timestamp + renderQaEntry helper)
+- src/renderer/index.html (status-activity element)
+- src/renderer/styles.css (status-activity style)
+- test.js (Test 13 for kb-008, Test 14 rename)
+- exercises/Sprint Contract Practice.md (results recorded)
+
+# Knowledge-Base App — Session Progress
 
 ## 2026-05-14 (kb-007)
 

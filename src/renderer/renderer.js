@@ -1,4 +1,4 @@
-// --- DOM references ---
+﻿// --- DOM references ---
 const importBtn = document.getElementById('import-btn');
 const docList = document.getElementById('doc-list');
 const qaThread = document.getElementById('qa-thread');
@@ -9,6 +9,7 @@ const newDocBtn = document.getElementById('new-doc-btn');
 const indexAllBtn = document.getElementById('index-all-btn');
 const statusIndexState = document.getElementById('status-index-state');
 const statusDocCount = document.getElementById('status-doc-count');
+const statusActivity = document.getElementById('status-activity');
 
 let currentDoc = null;
 let editMode = false;
@@ -150,6 +151,7 @@ async function indexSingleDocument(file) {
   file.indexed = true;
   renderDocumentView(file, content);
   updateStatusBar();
+  updateActivityTimestamp();
 }
 
 // --- Index all documents ---
@@ -175,6 +177,7 @@ async function indexAllDocuments() {
     }
   }
   updateStatusBar();
+  updateActivityTimestamp();
 }
 
 // --- Enter edit mode ---
@@ -236,6 +239,7 @@ async function importDocument() {
   if (imported) {
     await selectDocument(imported);
   }
+  updateActivityTimestamp();
 }
 
 // --- Create new document ---
@@ -258,6 +262,7 @@ async function createNewDocument() {
     await selectDocument(newFile);
     enterEditMode(newFile, '');
   }
+  updateActivityTimestamp();
 }
 
 // --- Delete document ---
@@ -276,6 +281,58 @@ async function deleteDocument(file) {
   await loadDocumentList();
 }
 
+// --- Load Q&A history on startup ---
+async function loadQaHistory() {
+  try {
+    const history = await window.kbAPI.getHistory();
+    if (!history || history.length === 0) return;
+
+    // Remove placeholder if present
+    const placeholder = qaThread.querySelector('.qa-placeholder');
+    if (placeholder) placeholder.remove();
+
+    history.forEach(entry => {
+      renderQaEntry(entry.question, entry.answer, entry.citations, entry.confidence);
+    });
+
+    qaThread.scrollTop = qaThread.scrollHeight;
+  } catch { /* history load is best-effort */ }
+}
+
+// --- Render a single Q&A entry (reusable for history and live submit) ---
+function renderQaEntry(question, answer, citations, confidence) {
+  // User question
+  const userMsg = document.createElement('div');
+  userMsg.className = 'qa-message qa-user';
+  userMsg.innerHTML = '<strong>Q:</strong> ' + escapeHtml(question);
+  qaThread.appendChild(userMsg);
+
+  // Response
+  const responseMsg = document.createElement('div');
+  responseMsg.className = 'qa-message qa-response';
+
+  let html = '<strong>A:</strong> ' + escapeHtml(answer).replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
+
+  if (citations && citations.length > 0) {
+    html += '<div class="qa-citation-list">';
+    citations.forEach(c => {
+      html += '<div class="qa-citation">' +
+        '<span class="qa-citation-doc">' + escapeHtml(c.docName) + ' (chunk ' + (c.chunkIndex + 1) + ')</span>' +
+        '<span class="qa-citation-excerpt">' + escapeHtml(c.excerpt) + '</span>' +
+        '</div>';
+    });
+    html += '</div>';
+  }
+
+  const pct = Math.round(confidence * 100);
+  const confClass = confidence >= 0.85 ? 'qa-confidence-high' : 'qa-confidence-low';
+  const confLabel = confidence >= 0.85 ? 'High confidence' : 'Low confidence';
+  html += '<div class="qa-confidence ' + confClass + '">' + confLabel + ' (' + pct + '%)</div>';
+
+  responseMsg.innerHTML = html;
+  qaThread.appendChild(responseMsg);
+}
+
 // --- Handle Q&A submission ---
 qaForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -286,50 +343,21 @@ qaForm.addEventListener('submit', async (e) => {
   const placeholder = qaThread.querySelector('.qa-placeholder');
   if (placeholder) placeholder.remove();
 
-  // Add user question
-  const userMsg = document.createElement('div');
-  userMsg.className = 'qa-message qa-user';
-  userMsg.innerHTML = '<strong>Q:</strong> ' + escapeHtml(question);
-  qaThread.appendChild(userMsg);
-
-  // Generate response via QaService
-  const responseMsg = document.createElement('div');
-  responseMsg.className = 'qa-message qa-response';
-
   try {
     const result = await window.kbAPI.ask(question);
-
-    // Answer text
-    let html = '<strong>A:</strong> ' + escapeHtml(result.answer).replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>');
-
-    // Citations
-    if (result.citations && result.citations.length > 0) {
-      html += '<div class="qa-citation-list">';
-      result.citations.forEach(c => {
-        html += '<div class="qa-citation">' +
-          '<span class="qa-citation-doc">' + escapeHtml(c.docName) + ' (chunk ' + (c.chunkIndex + 1) + ')</span>' +
-          '<span class="qa-citation-excerpt">' + escapeHtml(c.excerpt) + '</span>' +
-          '</div>';
-      });
-      html += '</div>';
-    }
-
-    // Confidence badge
-    const pct = Math.round(result.confidence * 100);
-    const confClass = result.confidence >= 0.85 ? 'qa-confidence-high' : 'qa-confidence-low';
-    const confLabel = result.confidence >= 0.85 ? 'High confidence' : 'Low confidence';
-    html += '<div class="qa-confidence ' + confClass + '">' + confLabel + ' (' + pct + '%)</div>';
-
-    responseMsg.innerHTML = html;
+    renderQaEntry(question, result.answer, result.citations, result.confidence);
   } catch {
+    const responseMsg = document.createElement('div');
+    responseMsg.className = 'qa-message qa-response';
     responseMsg.innerHTML = '<strong>A:</strong> Failed to process question.';
+    qaThread.appendChild(responseMsg);
   }
-  qaThread.appendChild(responseMsg);
 
   // Scroll to bottom
   qaThread.scrollTop = qaThread.scrollHeight;
 
   qaInput.value = '';
+  updateActivityTimestamp();
 });
 
 // --- Search document for question keywords ---
@@ -380,6 +408,14 @@ async function updateStatusBar(docCount) {
   statusDocCount.textContent = 'Docs: ' + count;
 }
 
+// --- Update activity timestamp ---
+function updateActivityTimestamp() {
+  if (statusActivity) {
+    const now = new Date();
+    statusActivity.textContent = 'Last: ' + now.toLocaleTimeString();
+  }
+}
+
 // --- Utility ---
 function escapeHtml(text) {
   const div = document.createElement('div');
@@ -403,7 +439,11 @@ async function init() {
     indexAllBtn.addEventListener('click', indexAllDocuments);
   }
 
+  // Load persisted Q&A history so thread survives restarts
+  await loadQaHistory();
+
   updateStatusBar();
+  updateActivityTimestamp();
 }
 
 init();
