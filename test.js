@@ -1,7 +1,7 @@
-﻿/*
+/*
  * test.js — Baseline verification suite (no framework, assert()-based)
  *
- * Test Map (11 blocks, 100+ assertions):
+ * Test Map (13 blocks, 170+ assertions):
  * ┌──────────┬─────────────────────────────┬────────────┬──────────────────────────────┐
  * │ Block    │ What it covers              │ Assertions │ How                           │
  * ├──────────┼─────────────────────────────┼────────────┼──────────────────────────────┤
@@ -18,6 +18,8 @@
  * │ Test 9   │ CRUD functional             │          7 │ Real fs ops + path-traversal │
  * │ Test 10  │ Document import (kb-005)    │         12 │ IPC, preload, renderer, HTML │
  * │ Test 11  │ Text indexing (kb-006)      │         20 │ Chunking logic + IPC + UI    │
+ * │ Test 12  │ Grounded Q&A (kb-007)       │         26 │ QaService + IPC + UI         │
+ * │ Test 13  │ Architectural rule check    │          7 │ check-arch.mjs + renderer    │
  * └──────────┴─────────────────────────────┴────────────┴──────────────────────────────┘
  */
 
@@ -439,6 +441,32 @@ assert(renderer.includes('qa-citation'), 'renderer creates citation DOM elements
 
 // 12n: renderer creates confidence score element
 assert(renderer.includes('qa-confidence'), 'renderer creates confidence score element');
+
+
+// --- Test 13: Architectural rule check ---
+console.log('\n--- Test 13: Architectural rule check ---');
+
+// 13a: check-arch.mjs exists
+const archCheckPath = path.join(__dirname, 'scripts', 'check-arch.mjs');
+assert(fs.existsSync(archCheckPath), 'check-arch.mjs script exists');
+
+// 13b: check-arch.mjs scans renderer for forbidden Node.js imports
+const archContent = fs.readFileSync(archCheckPath, 'utf-8');
+assert(archContent.includes('FORBIDDEN_BUILTINS'), 'check-arch.mjs defines forbidden built-ins list');
+assert(archContent.includes('renderer'), 'check-arch.mjs targets renderer layer');
+
+// 13c: renderer.js does NOT contain direct Node.js requires
+assert(!renderer.includes("require('fs')") && !renderer.includes('require("fs")'),
+  'renderer.js does not require fs directly');
+assert(!renderer.includes("require('path')") && !renderer.includes('require("path")'),
+  'renderer.js does not require path directly');
+assert(!renderer.includes("require('electron')") && !renderer.includes('require("electron")'),
+  'renderer.js does not require electron directly');
+
+// 13d: index.html does NOT contain Node.js script tags
+const mainJsContent = fs.readFileSync(path.join(__dirname, 'src', 'main', 'main.js'), 'utf-8');
+assert(mainJsContent.includes('contextIsolation: true'), 'main.js enforces contextIsolation: true');
+assert(mainJsContent.includes('nodeIntegration: false'), 'main.js enforces nodeIntegration: false');
 
 // --- Summary ---
 console.log('\n=== Results: ' + passed + ' passed, ' + failed + ' failed ===');

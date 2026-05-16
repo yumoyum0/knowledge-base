@@ -1,4 +1,4 @@
-﻿// --- DOM references ---
+// --- DOM references ---
 const importBtn = document.getElementById('import-btn');
 const docList = document.getElementById('doc-list');
 const qaThread = document.getElementById('qa-thread');

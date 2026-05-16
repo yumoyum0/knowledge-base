@@ -1,4 +1,4 @@
-﻿# AGENTS.md
+# AGENTS.md
 
 ## Project
 
@@ -20,6 +20,12 @@ Read these before writing any code:
 `feature_list.json` is the canonical source of truth for feature status. `PROGRESS.md` is the narrative session log. When they disagree, `feature_list.json` wins.
 
 When adding features, update the relevant doc before writing code.
+
+## Feature List Rules
+- Feature list file: feature_list.json
+- Only one feature active at a time
+- Verification command must pass before marking as passing
+- Don't modify feature list states yourself — the verification script updates them automatically
 
 ## Quick Start
 
@@ -64,6 +70,7 @@ Before writing code:
 5. Review recent commits with `git log --oneline -5`.
 6. Run `./init.sh` or `./init.ps1`.
 7. Confirm baseline verification passes (`npm run verify`) before starting new work.
+| `npm run check-arch` | Scans renderer for forbidden Node.js imports (architectural constraint). 0 violations = clean. |
 
 If baseline verification is already failing, fix that first. See
 [docs/recovery.md](docs/recovery.md).
@@ -81,8 +88,9 @@ Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 
 | Command | What it checks |
 |---------|---------------|
-| `npm run verify` | Single-command baseline: runs lint then test. Use before starting new work. |
-| `npm test` | 145 assertions across data/, file listing, HTML structure, renderer functions, Q&A, CRUD, preload API, main.js IPC, indexing |
+| `npm run verify` | Single-command baseline: lint, check-arch, then test. Use before starting new work. |
+| `npm run check-arch` | Scans renderer for forbidden Node.js imports (architectural constraint). 0 violations = clean. |
+| `npm test` | 179 assertions across data/, file listing, HTML structure, renderer functions, Q&A, CRUD, preload API, main.js IPC, indexing |
 | `npm run lint` | ESLint on main.js, preload.js, renderer.js, test.js — 0 errors, 0 warnings |
 | `node --version` | Must be Node 24.x |
 | `npm install` | Dependencies up to date |
@@ -106,6 +114,15 @@ Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 - Prefer durable repo artifacts over chat summaries.
 - Update README.md before commit.
 - See [docs/working-conventions.md](docs/working-conventions.md) for commit format and full rules.
+
+## Definition of Done
+- Feature complete = end-to-end verification passed, not "code is written"
+- Required verification levels:
+  1. Unit tests pass
+  2. Integration tests pass
+  3. End-to-end flow verification passes
+- Do not proceed to level 2 if level 1 fails
+- Do not proceed to level 3 if level 2 fails
 
 ## Clean State Checklist
 
