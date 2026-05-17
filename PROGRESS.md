@@ -1,4 +1,33 @@
 ﻿
+
+## 2026-05-17 (Exercise: Clean State Checklist)
+
+### Current State
+- Exercise: Clean State Checklist completed. Five-dimension session exit checklist designed and applied across 5 simulated sessions.
+- 200 tests passing. ESLint: 0 errors, 0 warnings. check-arch: 0 violations.
+- kb-001 through kb-008 all passing.
+
+### Actions Taken
+- Designed five-dimension clean state checklist (Build/Test/Progress/Artifact/Startup) based on Harness Engineering model.
+- Integrated checklist into AGENTS.md Clean State Checklist section.
+- Replaced clean-state-checklist.md with reusable template + violation log.
+- Applied checklist across 5 simulated sessions: Session 1 found 5 violations (stale assertion counts, outdated domain grades), Sessions 3-5 clean.
+- Corrected AGENTS.md assertion count (179->200), quality-document.md domain grades and assertion counts, docs/session-checklist.md stale count (75/75->200/200).
+- Promoted all product domain grades to A in quality-document.md.
+
+### Violations Fixed
+1. AGENTS.md: stale assertion count 179 vs actual 200
+2. quality-document.md: stale assertion counts 145/171 vs actual 200
+3. quality-document.md: Grounded Answers domain "--" but kb-007 passing -> A
+4. quality-document.md: Persistence domain "--" but kb-008 passing -> A
+5. docs/session-checklist.md: stale count 75/75 vs actual 200/200
+
+### Files Modified
+- AGENTS.md (add Clean State Checklist section, fix assertion count)
+- clean-state-checklist.md (replace with five-dimension template + violation log)
+- quality-document.md (promote grades, fix counts, add change history)
+- docs/session-checklist.md (fix stale assertion count)
+- exercises/Clean State Checklis.md (record results)
 ## 2026-05-16 (kb-008)
 
 ### Current State

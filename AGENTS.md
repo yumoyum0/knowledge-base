@@ -1,4 +1,4 @@
-# AGENTS.md
+﻿# AGENTS.md
 
 ## Project
 
@@ -25,7 +25,7 @@ When adding features, update the relevant doc before writing code.
 - Feature list file: feature_list.json
 - Only one feature active at a time
 - Verification command must pass before marking as passing
-- Don't modify feature list states yourself — the verification script updates them automatically
+- Don't modify feature list states yourself 鈥?the verification script updates them automatically
 
 ## Quick Start
 
@@ -45,17 +45,17 @@ Both scripts run `npm install`, `npm test`, and `npm run lint`. They also set up
 ## Layer Boundaries
 
 ```
-src/renderer/  ←→  src/preload/  ←→  src/main/  ←→  src/services/
+src/renderer/  鈫愨啋  src/preload/  鈫愨啋  src/main/  鈫愨啋  src/services/
 (React UI)          (contextBridge)    (ipcMain)      (business logic)
 ```
 
 - **Renderer** (`src/renderer/`, currently `renderer.js` at root): React + TypeScript UI. Communicates exclusively through `window.knowledgeBase` API. Never imports Node.js modules.
-- **Preload** (`src/preload/`, currently `preload.js` at root): The ONLY bridge. Uses `contextBridge.exposeInMainWorld`. API surface: `kbAPI.*` (current JS) → `window.knowledgeBase.*` (target TS).
+- **Preload** (`src/preload/`, currently `preload.js` at root): The ONLY bridge. Uses `contextBridge.exposeInMainWorld`. API surface: `kbAPI.*` (current JS) 鈫?`window.knowledgeBase.*` (target TS).
 - **Main** (`src/main/`, currently `main.js` at root): Owns BrowserWindow lifecycle, IPC registration, and all filesystem access via services.
 - **Services** (`src/services/`): Pure business logic. DocumentService, IndexingService, QaService, PersistenceService.
 - **Shared** (`src/shared/`): IPC channel constants and type definitions. Channels defined once, imported by both main and preload.
 
-**Current → Target migration**: Root-level JS files will migrate into `src/` as TypeScript conversion proceeds.
+**Current 鈫?Target migration**: Root-level JS files will migrate into `src/` as TypeScript conversion proceeds.
 
 ## Startup Workflow
 
@@ -90,14 +90,14 @@ Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 |---------|---------------|
 | `npm run verify` | Single-command baseline: lint, check-arch, then test. Use before starting new work. |
 | `npm run check-arch` | Scans renderer for forbidden Node.js imports (architectural constraint). 0 violations = clean. |
-| `npm test` | 179 assertions across data/, file listing, HTML structure, renderer functions, Q&A, CRUD, preload API, main.js IPC, indexing |
-| `npm run lint` | ESLint on main.js, preload.js, renderer.js, test.js — 0 errors, 0 warnings |
+| `npm test` | 200 assertions across data/, file listing, HTML structure, renderer functions, Q&A, CRUD, preload API, main.js IPC, indexing, persistence |
+| `npm run lint` | ESLint on main.js, preload.js, renderer.js, test.js 鈥?0 errors, 0 warnings |
 | `node --version` | Must be Node 24.x |
 | `npm install` | Dependencies up to date |
 
 ## Conventions
 
-- **Electron security**: `contextIsolation: true`, `nodeIntegration: false` — never relax.
+- **Electron security**: `contextIsolation: true`, `nodeIntegration: false` 鈥?never relax.
 - **IPC channels**: Follow pattern `namespace:action` (e.g., `documents:import`, `documents:get-content`). Defined in `src/shared/types.ts` (target).
 - **Path safety**: All renderer-provided paths validated against `dataDir`. New filenames go through `path.basename()`.
 - **TypeScript** (target): Strict mode. No `any` without a comment. Named exports only.
@@ -126,7 +126,24 @@ Both init scripts export `GIT_CONFIG_GLOBAL` pointing to the project-local
 
 ## Clean State Checklist
 
-Before declaring the project complete, verify every item in [clean-state-checklist.md](clean-state-checklist.md).
+Run at the end of every session. All five dimensions must pass before the
+session is considered complete. See [clean-state-checklist.md](clean-state-checklist.md)
+for the full template and violation log.
+
+### 1. Build
+- `node --version` is 24.x, `npm install` clean
+
+### 2. Test
+- `npm test` passes (200 assertions), `npm run lint` clean, `npm run check-arch` clean
+
+### 3. Progress
+- `feature_list.json`, `PROGRESS.md`, `session-handoff.md`, and `quality-document.md` all current
+
+### 4. Artifact
+- No debug code, stale files, or contradictory documentation. `git status` clean.
+
+### 5. Startup
+- `./init.ps1` / `./init.sh` succeeds. Next session can start without manual repair.
 
 ## Session Handoff
 
@@ -156,8 +173,8 @@ When resuming work, read [session-handoff.md](session-handoff.md) for context fr
 
 ## Further Reading
 
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Electron layers, data flow, import pipeline
-- [docs/PRODUCT.md](docs/PRODUCT.md) — Feature requirements and UI layout
-- [quality-document.md](quality-document.md) — Quality grades per domain and layer
-- [data/Harness Engineering.md](data/Harness%20Engineering.md) — Five-subsystem harness model
-- [BOOTSTRAP.md](BOOTSTRAP.md) — Bootstrap contract: start commands, current state, task breakdown
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) 鈥?Electron layers, data flow, import pipeline
+- [docs/PRODUCT.md](docs/PRODUCT.md) 鈥?Feature requirements and UI layout
+- [quality-document.md](quality-document.md) 鈥?Quality grades per domain and layer
+- [data/Harness Engineering.md](data/Harness%20Engineering.md) 鈥?Five-subsystem harness model
+- [BOOTSTRAP.md](BOOTSTRAP.md) 鈥?Bootstrap contract: start commands, current state, task breakdown

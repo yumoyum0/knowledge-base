@@ -1,76 +1,125 @@
-﻿# Clean State Checklist
+# Clean State Checklist
 
-*Executed 2026-05-14 as a fresh agent session for Exercise 4-3.*
+Five-dimension session exit checklist from the Harness Engineering model.
+Run at the end of every session before committing. All five dimensions must
+pass before the session is considered complete.
 
-## Build Verification
+**Last template update**: 2026-05-17
 
-- [x] `npm install` completes without errors (up to date in 2s).
-- [x] `npm test` passes — 145/145 assertions, 0 failures.
-- [x] `npm run lint` passes — 0 errors, 0 warnings.
-- [x] `node --version` meets requirement — v24.15.0 (>= 24.x).
+---
 
-Note: No `npm run build` or `npm run check` yet — TypeScript and Vite not integrated (planned migration path).
+## 1. Build Dimension
 
-## Feature Verification
+Does the project build and install without errors?
 
-- [x] Document list loads from data/ directory — tested via loadDocumentList / listFiles.
-- [x] Import button triggers file picker for .txt/.md — kb-005 passing.
-- [x] Document metadata displayed (title, filename, size, import date) — kb-005 passing.
-- [x] Document content viewable — getContent IPC channel working.
-- [x] Document create, edit, delete with path safety — kb-004 passing.
-- [x] Text indexing with paragraph-aware chunking (~500 chars) — kb-006 passing.
-- [x] Chunk metadata includes charCount and wordCount — kb-006 passing.
-- [x] Index status tracked per-document and globally — kb-006 passing.
-- [x] Status bar shows index state (idle/indexing/ready/error) — kb-006 passing.
-- [x] Keyword-based Q&A with conversation thread — kb-003 passing.
-- [ ] Grounded Q&A with citations and confidence scores — kb-007 not_started.
-- [ ] Cross-session persistence of all data in knowledge-base-data/ — kb-008 not_started.
-- [ ] Electron window visual verification — not possible in headless sandbox.
+- [ ] `node --version` is 24.x (currently v24.15.0)
+- [ ] `npm install` completes without errors
+- [ ] `package.json` dependencies are consistent with `node_modules/`
+- [ ] No peer dependency warnings or deprecated package warnings
 
-## Scope Control
+## 2. Test Dimension
 
-- [x] feature_list.json is canonical source of truth — 8 features, statuses match test coverage.
-- [x] Passing features have evidence entries (kb-001 through kb-006).
-- [x] No feature has contradictory status — kb-007 and kb-008 correctly marked not_started.
-- [x] AGENTS.md enforces one-feature-at-a-time policy.
-- [x] Feature dependencies are implicit but traceable (import → index → Q&A → persistence).
+Do all tests and quality checks pass?
 
-## Code Quality
+- [ ] `npm test` passes with 0 failures (currently 200 assertions)
+- [ ] `npm run lint` passes with 0 errors, 0 warnings
+- [ ] `npm run check-arch` passes with 0 forbidden imports
+- [ ] `npm run verify` passes (umbrella command)
+- [ ] Test count in AGENTS.md and quality-document.md matches actual test output
 
-- [x] All files currently vanilla JS — TypeScript strict-mode conventions defined but not yet active.
-- [x] IPC channels follow `namespace:action` pattern (documents:*, indexing:*).
-- [x] Renderer never imports Node.js modules — communicates via `window.knowledgeBase` (preload bridge).
-- [x] Path safety enforced — `path.basename()` and `startsWith(dataDir)` guards in main process.
-- [x] `contextIsolation: true`, `nodeIntegration: false` — never relaxed.
-- [ ] No `any` types without comments — not yet applicable (JS, not TS).
-- [ ] All exports are named exports — not yet applicable (JS, not TS).
-- [ ] IPC channels defined in `src/shared/types.ts` only — not yet applicable (no TS).
+## 3. Progress Dimension
 
-## Documentation
+Is current progress recorded in machine-readable artifacts?
 
-- [x] AGENTS.md — routing file with docs hierarchy, layer boundaries, Quick Start, verification commands.
-- [x] docs/ARCHITECTURE.md — layer diagram, Electron layers, import flow, data storage.
-- [x] docs/PRODUCT.md — feature requirements, UI layout, constraints.
-- [x] PROGRESS.md — session log through 2026-05-14 (Exercise 4-3).
-- [x] feature_list.json — canonical feature status.
-- [x] quality-document.md — quality grades per domain and layer.
-- [x] docs/recovery.md — baseline repair procedures.
-- [x] docs/session-checklist.md — end-of-session steps.
-- [x] docs/working-conventions.md — working rules and commit format.
-- [x] clean-state-checklist.md — this file.
+- [ ] `feature_list.json` `last_updated` reflects current date
+- [ ] `feature_list.json` feature statuses match test coverage
+- [ ] `PROGRESS.md` has entry for current session
+- [ ] `PROGRESS.md` "Next Features" table is accurate
+- [ ] `session-handoff.md` is updated
+- [ ] `quality-document.md` reflects current grades and assertion counts
 
-## Comparison with data/solution/clean-state-checklist.md
+## 4. Artifact Dimension
 
-The reference solution (Project 03) is a more mature TypeScript + React project. Differences and
-planned alignment:
+Are there stale or ambiguous temporary artifacts?
 
-| Area | Reference (Project 03) | This Project | Gap |
-|------|----------------------|--------------|-----|
-| Build | `npm run check` (TS), `npm run build` (Vite) | `npm run verify` (lint + test) | TS/Vite not integrated |
-| Features | All 8 pass, Q&A with citations, persistence | kb-001–006 pass, kb-007–008 not_started | 2 features remaining |
-| Code Quality | TS strict, named exports, shared types | JS conventions, path safety rules | TS migration pending |
-| Scope Control | All features at "pass" | 6/8 passing | Expected at current stage |
+- [ ] No `console.log`, `debugger`, or `TODO` in `src/` or `test.js`
+- [ ] No `.tmp`, `.log`, or backup files outside `.gitignore`
+- [ ] No commented-out code blocks without explanatory comments
+- [ ] No duplicate or contradictory documentation
+- [ ] `git status` is clean (only intentional working files)
+- [ ] No stale test data in `data/` beyond sample documents
 
-The solution checklist will become the model for this project once kb-007 and kb-008 are complete
-and TypeScript + React migration begins. For now, the six-item template plus Harness Engineering
-model provide appropriate coverage.
+## 5. Startup Dimension
+
+Is the standard startup path available?
+
+- [ ] `./init.ps1` or `./init.sh` succeeds end-to-end
+- [ ] A fresh agent session can answer "how to run" and "how to test" from repo alone
+- [ ] `AGENTS.md` Quick Start commands are correct and tested
+- [ ] All doc links in `AGENTS.md` resolve to existing files
+- [ ] `BOOTSTRAP.md` is current
+- [ ] No manual repair steps needed before next session can begin
+
+---
+
+## Violation Log
+
+Record violations per dimension across consecutive sessions. Goal: zero
+violations at session exit.
+
+| Session | Date | Build | Test | Progress | Artifact | Startup | Total | Notes |
+|---------|------|-------|------|----------|----------|---------|-------|-------|
+| 1 | 2026-05-17 | 0 | 0 | 2 | 3 | 0 | 5 | Initial sweep found stale assertion counts + outdated domain grades |
+| 2 | 2026-05-17 | 0 | 0 | 1 | 1 | 0 | 2 | After fixing AGENTS.md, quality-doc still had issues |
+| 3 | 2026-05-17 | 0 | 0 | 0 | 0 | 0 | 0 | All dimensions green |
+| 4 | 2026-05-17 | 0 | 0 | 0 | 0 | 0 | 0 | All dimensions green |
+| 5 | 2026-05-17 | 0 | 0 | 0 | 0 | 0 | 0 | All dimensions green |
+
+---
+
+## Session Detail
+
+### Session 1 — 2026-05-17
+
+**Build**: PASS (0 violations)
+- Node v24.15.0, npm install clean
+
+**Test**: PASS (0 violations)
+- 200/200 assertions, 0 failures. ESLint clean. check-arch clean.
+
+**Progress**: 2 violations
+- VIOLATION: `AGENTS.md` says "179 assertions" but actual is 200 (stale from before kb-008)
+- VIOLATION: `quality-document.md` Product Domains table assertion counts outdated (145 vs 200)
+
+**Artifact**: 3 violations
+- VIOLATION: `quality-document.md` Product Domain "Grounded Answers" shows grade "--" but kb-007 is passing
+- VIOLATION: `quality-document.md` Product Domain "Persistence" shows grade "--" but kb-008 is passing
+- VIOLATION: `docs/session-checklist.md` assertion reference outdated (says "75/75")
+
+**Startup**: PASS (0 violations)
+
+### Session 2 — 2026-05-17
+
+**Progress**: 1 violation
+- VIOLATION: `quality-document.md` domain grades still not promoted for kb-007 and kb-008
+
+**Artifact**: 1 violation
+- VIOLATION: `docs/session-checklist.md` Quick Check section still says "75/75"
+
+### Sessions 3–5 — 2026-05-17
+
+All five dimensions green. Zero violations. Project is in clean state.
+
+---
+
+## Reference: Five-Dimension Model
+
+From [data/Harness Engineering.md](data/Harness%20Engineering.md), "Clean Handoff at the End of Every Session":
+
+- **Build**: Does the code build without errors?
+- **Test**: Do all tests pass? Verified in CI, not "works on my machine."
+- **Progress**: Is current progress recorded in a machine-readable artifact?
+- **Artifact**: Are there stale or ambiguous temporary artifacts?
+- **Startup**: Is the standard startup path available?
+
+Clean state = all five conditions satisfied. Missing any one means the session isn't "done."

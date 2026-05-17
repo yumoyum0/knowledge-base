@@ -43,4 +43,4 @@ Before committing, run:
 ```bash
 npm test && npm run lint
 ```
-Both must pass (75/75, 0/0). If either fails, fix before committing.
+Both must pass (200/200, 0/0). If either fails, fix before committing.
